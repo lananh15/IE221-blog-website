@@ -18,7 +18,7 @@ if(isset($message)){
       <a href="home.php" class="logo">Blogo.</a>
 
       <form action="search.php" method="POST" class="search-form">
-         <input type="text" name="search_box" class="box" maxlength="100" placeholder="Search for blogs..." required>
+         <input type="text" name="search_box" class="box" maxlength="100" placeholder="Search..." required>
          <button type="submit" class="fas fa-search" name="search_btn"></button>
       </form>
 
