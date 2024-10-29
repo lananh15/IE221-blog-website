@@ -38,7 +38,7 @@ if(isset($_POST['submit'])){
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Log in</title>
+   <title>Login</title>
    
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -50,15 +50,22 @@ if(isset($_POST['submit'])){
 <body>
    
 <!-- header section starts  -->
-<?php include 'components/user_header.php'; ?>
+<!-- <?php include 'components/user_header.php'; ?> -->
 <!-- header section ends -->
 
 <section class="form-container">
 
    <form action="" method="post">
-      <h3>Login</h3>
-      <input type="email" name="email" required placeholder="Enter your email..." class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="pass" required placeholder="Enter your password..." class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <img src="uploaded_img/doraemon.webp" style="width:17%">
+      <div class="divider">
+         <span>OR</span>
+      </div>
+
+      
+      <label class="label-form">Email</label>
+      <input type="email" name="email" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <label class="label-form">Password</label>
+      <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
       <input type="submit" value="Login" name="submit" class="btn">
       <p>Don't have an account yet? <a href="register.php">Register</a></p>
    </form>

@@ -65,40 +65,29 @@ if(isset($_POST['submit'])){
 <body>
    
 <!-- header section starts  -->
-<?php include 'components/user_header.php'; ?>
+<!-- <?php include 'components/user_header.php'; ?> -->
 <!-- header section ends -->
 
 <section class="form-container">
 
    <form action="" method="post">
-      <h3>Register</h3>
-      <input type="text" name="name" required placeholder="Enter your name" class="box" maxlength="50">
-      <input type="email" name="email" required placeholder="Enter your email" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="pass" required placeholder="Enter your password" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="cpass" required placeholder="Confirm your password" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <img src="uploaded_img/doraemon.webp" style="width:17%">
+      <div class="divider">
+         <span>OR</span>
+      </div>
+      <label class="label-form">Your Name</label>
+      <input type="text" name="name" required class="box" maxlength="50">
+      <label class="label-form">Email</label>
+      <input type="email" name="email" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <label class="label-form">Password</label>
+      <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <label class="label-form">Confirm Password</label>
+      <input type="password" name="cpass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
       <input type="submit" value="register" name="submit" class="btn">
       <p>Already have an account? <a href="login.php">Login</a></p>
    </form>
 
 </section>
-
-
-
-
-
-
-
-
-
-
-
-<?php include 'components/footer.php'; ?>
-
-
-
-
-
-
 
 <!-- custom js file link  -->
 <script src="js/script.js"></script>
