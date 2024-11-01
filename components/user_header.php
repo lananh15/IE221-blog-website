@@ -15,7 +15,7 @@ if(isset($message)){
 
    <section class="flex">
 
-      <a href="home.php" class="logo">Blogo.</a>
+      <a href="home.php" class="logo">PyBlog</a>
 
       <form action="search.php" method="POST" class="search-form">
          <input type="text" name="search_box" class="box" maxlength="100" placeholder="Search..." required>

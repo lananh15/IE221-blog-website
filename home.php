@@ -69,8 +69,118 @@ include 'components/like_post.php';
          <?php
           }
          ?>
-      </div>
+         <div class="sidebar">
+            <ul>
+               <li>
+                  <a href="/" class="sidebar-navigation-link c-link c-link--block c-link--icon-left">
+                     <span class="c-link__icon" style="display: flex;">
+                           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
+                              <linearGradient id="jv689zNUBazMNK6AOyXtga_wFfu6zXx15Yk_gr1" x1="6" x2="42" y1="41" y2="41" gradientUnits="userSpaceOnUse">
+                                 <stop offset="0" stop-color="#c8d3de"></stop>
+                                 <stop offset="1" stop-color="#c8d3de"></stop>
+                              </linearGradient>
+                              <path fill="url(#jv689zNUBazMNK6AOyXtga_wFfu6zXx15Yk_gr1)" d="M42,39H6v2c0,1.105,0.895,2,2,2h32c1.105,0,2-0.895,2-2V39z"></path>
+                              <linearGradient id="jv689zNUBazMNK6AOyXtgb_wFfu6zXx15Yk_gr2" x1="14.095" x2="31.385" y1="10.338" y2="43.787" gradientUnits="userSpaceOnUse">
+                                 <stop offset="0" stop-color="#fcfcfc"></stop>
+                                 <stop offset=".495" stop-color="#f4f4f4"></stop>
+                                 <stop offset=".946" stop-color="#e8e8e8"></stop>
+                                 <stop offset="1" stop-color="#e8e8e8"></stop>
+                              </linearGradient>
+                              <path fill="url(#jv689zNUBazMNK6AOyXtgb_wFfu6zXx15Yk_gr2)" d="M42,39H6V20L24,3l18,17V39z"></path>
+                              <path fill="#de490d" d="M13,25h10c0.552,0,1,0.448,1,1v17H12V26C12,25.448,12.448,25,13,25z"></path>
+                              <path d="M24,4c-0.474,0-0.948,0.168-1.326,0.503l-5.359,4.811L6,20v5.39L24,9.428L42,25.39V20L30.685,9.314l-5.359-4.811C24.948,4.168,24.474,4,24,4z" opacity=".05"></path>
+                              <path d="M24,3c-0.474,0-0.948,0.167-1.326,0.5l-5.359,4.784L6,18.909v5.359L24,8.397l18,15.871v-5.359L30.685,8.284L25.326,3.5C24.948,3.167,24.474,3,24,3z" opacity=".07"></path>
+                              <linearGradient id="jv689zNUBazMNK6AOyXtgc_wFfu6zXx15Yk_gr3" x1="24" x2="24" y1="1.684" y2="23.696" gradientUnits="userSpaceOnUse">
+                                 <stop offset="0" stop-color="#d43a02"></stop>
+                                 <stop offset="1" stop-color="#b9360c"></stop>
+                              </linearGradient>
+                              <path fill="url(#jv689zNUBazMNK6AOyXtgc_wFfu6zXx15Yk_gr3)" d="M44.495,19.507L25.326,2.503C24.948,2.168,24.474,2,24,2s-0.948,0.168-1.326,0.503L3.505,19.507c-0.42,0.374-0.449,1.02-0.064,1.43l1.636,1.745c0.369,0.394,0.984,0.424,1.39,0.067L24,7.428L41.533,22.75c0.405,0.356,1.021,0.327,1.39-0.067l1.636-1.745C44.944,20.527,44.915,19.881,44.495,19.507z"></path>
+                              <linearGradient id="jv689zNUBazMNK6AOyXtgd_wFfu6zXx15Yk_gr4" x1="28.05" x2="35.614" y1="25.05" y2="32.614" gradientUnits="userSpaceOnUse">
+                                 <stop offset="0" stop-color="#33bef0"></stop>
+                                 <stop offset="1" stop-color="#0a85d9"></stop>
+                              </linearGradient>
+                              <path fill="url(#jv689zNUBazMNK6AOyXtgd_wFfu6zXx15Yk_gr4)" d="M29,25h6c0.552,0,1,0.448,1,1v6c0,0.552-0.448,1-1,1h-6c-0.552,0-1-0.448-1-1v-6C28,25.448,28.448,25,29,25z"></path>
+                           </svg>
+                     </span>
+                     &nbsp;&nbsp;Home
+                  </a>
+               </li>
 
+               <li>
+                  <a href="posts.php" class="sidebar-navigation-link c-link c-link--block c-link--icon-left">
+                     <span class="c-link__icon" style="display: flex;">
+                           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 64 64">
+                              <linearGradient id="gPWjxlu7lDdzZroFFR7GZa_79041_gr1" x1="32" x2="32" y1="9.083" y2="54.676" gradientUnits="userSpaceOnUse" spreadMethod="reflect">
+                                 <stop offset="0" stop-color="#1a6dff"></stop>
+                                 <stop offset="1" stop-color="#c822ff"></stop>
+                              </linearGradient>
+                              <path fill="url(#gPWjxlu7lDdzZroFFR7GZa_79041_gr1)" d="M50,55H14c-2.757,0-5-2.243-5-5V14c0-2.757,2.243-5,5-5h36c2.757,0,5,2.243,5,5v36 C55,52.757,52.757,55,50,55z M14,11c-1.654,0-3,1.346-3,3v36c0,1.654,1.346,3,3,3h36c1.654,0,3-1.346,3-3V14c0-1.654-1.346-3-3-3H14 z"></path>
+                              <linearGradient id="gPWjxlu7lDdzZroFFR7GZb_79041_gr2" x1="32" x2="32" y1="19" y2="45" gradientUnits="userSpaceOnUse" spreadMethod="reflect">
+                                 <stop offset="0" stop-color="#6dc7ff"></stop>
+                                 <stop offset="1" stop-color="#e6abff"></stop>
+                              </linearGradient>
+                              <path fill="url(#gPWjxlu7lDdzZroFFR7GZb_79041_gr2)" d="M43,29h-1c-1.11,0-2-0.9-2-2c0-4.4-3.6-8-8-8h-5c-4.4,0-8,3.6-8,8v10c0,4.4,3.6,8,8,8h10 c4.4,0,8-3.6,8-8v-6C45,29.9,44.1,29,43,29z M27,25h5c1.1,0,2,0.9,2,2c0,1.1-0.9,2-2,2h-5c-1.1,0-2-0.9-2-2C25,25.9,25.9,25,27,25z M37,39H27c-1.1,0-2-0.9-2-2c0-1.1,0.9-2,2-2h10c1.1,0,2,0.9,2,2C39,38.1,38.1,39,37,39z"></path>
+                           </svg>
+                     </span>
+                     &nbsp;&nbsp;Posts
+                  </a>
+               </li>
+
+               <li>
+                  <a href="contact.php" class="sidebar-navigation-link c-link c-link--block c-link--icon-left">
+                     <span class="c-link__icon" style="display: flex;">
+                           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 40 40">
+                              <path fill="#e1ebf2" d="M8.545,37.5c-3.333,0-6.045-2.712-6.045-6.045V8.545C2.5,5.212,5.212,2.5,8.545,2.5h22.909 c3.333,0,6.045,2.712,6.045,6.045v22.909c0,3.333-2.712,6.045-6.045,6.045L8.545,37.5L8.545,37.5z"></path>
+                              <path fill="#788b9c" d="M31.455,3C34.512,3,37,5.488,37,8.545v22.909C37,34.512,34.512,37,31.455,37H8.545 C5.488,37,3,34.512,3,31.455V8.545C3,5.488,5.488,3,8.545,3H31.455 M31.455,2H8.545C4.945,2,2,4.945,2,8.545v22.909 C2,35.055,4.945,38,8.545,38h22.909c3.6,0,6.545-2.945,6.545-6.545V8.545C38,4.945,35.055,2,31.455,2L31.455,2z"></path>
+                              <path fill="#c5d4de" d="M37.5,11.5V8.55c0-2.98-2.16-5.46-5-5.96v8.91H37.5z"></path>
+                              <path fill="#788b9c" d="M38,12h-6V1.994l0.587,0.104C35.724,2.649,38,5.363,38,8.55V12z M33,11h4V8.55 c0-2.497-1.649-4.651-4-5.331V11z"></path>
+                              <rect width="5" height="8.5" x="32.5" y="11.5" fill="#8bb7f0"></rect>
+                              <path fill="#4e7ab5" d="M38,20.5h-6V11h6V20.5z M33,19.5h4V12h-4V19.5z"></path>
+                              <path fill="#c5d4de" d="M26,27.23c-2.101,2.165-5.132,3.52-8.5,3.52s-6.399-1.355-8.5-3.52c1.882-2.105,4.988-3.48,8.5-3.48 S24.118,25.125,26,27.23z"></path>
+                              <rect width="5" height="8.5" x="32.5" y="20" fill="#ffc49c"></rect>
+                              <path fill="#a16a4a" d="M38,29h-6v-9.5h6V29z M33,28h4v-7.5h-4V28z"></path>
+                              <path fill="#bae0bd" d="M37.5,28.5v2.95c0,2.98-2.16,5.46-5,5.96V28.5H37.5z"></path>
+                              <path fill="#5e9c76" d="M32,38.006V28h6v3.45c0,3.187-2.276,5.9-5.413,6.452L32,38.006z M33,29v7.781 c2.351-0.68,4-2.834,4-5.331V29H33z"></path>
+                              <path fill="#788b9c" d="M17.5,31.5C11.159,31.5,6,26.341,6,20S11.159,8.5,17.5,8.5S29,13.659,29,20S23.841,31.5,17.5,31.5z M17.5,9.5C11.71,9.5,7,14.21,7,20s4.71,10.5,10.5,10.5S28,25.79,28,20S23.29,9.5,17.5,9.5z"></path>
+                              <ellipse cx="17.5" cy="17.5" fill="#c5d4de" rx="3.5" ry="4"></ellipse>
+                              <path fill="#788b9c" d="M17.5,22c-2.206,0-4-2.019-4-4.5s1.794-4.5,4-4.5s4,2.019,4,4.5S19.706,22,17.5,22z M17.5,14 c-1.654,0-3,1.57-3,3.5s1.346,3.5,3,3.5s3-1.57,3-3.5S19.154,14,17.5,14z"></path>
+                              <path fill="#788b9c" d="M25.627,27.563C23.633,25.332,20.595,24,17.5,24s-6.133,1.332-8.127,3.563l-0.746-0.666 C10.809,24.457,14.125,23,17.5,23s6.691,1.457,8.873,3.897L25.627,27.563z"></path>
+                           </svg>
+                     </span>
+                     &nbsp;&nbsp;Contact
+                  </a>
+               </li>
+
+               <li>
+                  <a href="about.php" class="sidebar-navigation-link c-link c-link--block c-link--icon-left">
+                     <span class="c-link__icon" style="display: flex;">
+                           <!-- Your SVG Icon -->
+                           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
+                              <linearGradient id="SVGID_1__VQv9SRYLXqvJ_gr1" x1="37.081" x2="5.793" y1="10.918" y2="42.206" gradientUnits="userSpaceOnUse">
+                                 <stop offset="0" stop-color="#60e8fe"></stop>
+                                 <stop offset=".033" stop-color="#6ae9fe"></stop>
+                                 <stop offset=".197" stop-color="#97f0fe"></stop>
+                                 <stop offset=".362" stop-color="#bdf5ff"></stop>
+                                 <stop offset=".525" stop-color="#dafaff"></stop>
+                                 <stop offset=".687" stop-color="#eefdff"></stop>
+                                 <stop offset=".846" stop-color="#fbfeff"></stop>
+                                 <stop offset="1" stop-color="#fff"></stop>
+                              </linearGradient>
+                              <path fill="url(#SVGID_1__VQv9SRYLXqvJ_gr1)" d="M24,5.499c-10.217,0-18.5,8.283-18.5,18.5c0,3.266,0.854,6.33,2.34,8.994l-2.301,8.238 c-0.21,0.75,0.481,1.442,1.232,1.232l8.242-2.3c2.662,1.484,5.723,2.336,8.987,2.336c10.217,0,18.5-8.283,18.5-18.5 S34.217,5.499,24,5.499z"></path>
+                              <line x1="24" x2="24" y1="14.5" y2="26.5" fill="none" stroke="#10cfe3" stroke-linecap="round" stroke-width="3"></line>
+                              <path fill="none" stroke="#10cfe3" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M41.129,31.001C42.013,28.842,42.5,26.478,42.5,24c0-10.217-8.283-18.5-18.5-18.5 c-2.858,0-5.565,0.648-7.981,1.806"></path>
+                              <path fill="none" stroke="#10cfe3" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9.779,12.167C7.107,15.374,5.5,19.499,5.5,24c0,3.266,0.854,6.33,2.34,8.994l-2.301,8.238 c-0.21,0.75,0.481,1.442,1.232,1.232l8.242-2.3C17.675,41.648,20.736,42.5,24,42.5c4.745,0,9.073-1.787,12.348-4.724"></path>
+                              <circle cx="24" cy="33" r="2" fill="#10cfe3"></circle>
+                           </svg>
+                     </span>
+                     &nbsp;&nbsp;About
+                  </a>
+               </li>
+
+            </ul>
+         </div>
+      </div>
+      
       <!-- <div class="box">
          <p>categories</p>
          <div class="flex-box">
@@ -87,6 +197,7 @@ include 'components/like_post.php';
             <a href="all_category.php" class="btn">View all</a>
          </div>
       </div> -->
+      
       <section class="posts-container">
 
          <h1 class="heading">Latest posts</h1>
@@ -177,25 +288,6 @@ include 'components/like_post.php';
    </div>
 
 </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <?php include 'components/footer.php'; ?>

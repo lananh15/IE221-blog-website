@@ -36,7 +36,7 @@ include 'components/like_post.php';
 <!-- header section ends -->
 
 
-<section class="authors">
+<section class="simple-content">
 
    <h1 class="heading">Authors</h1>
 

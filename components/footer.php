@@ -1,3 +1,3 @@
 <footer class="footer">
-   &copy; copyright @ <?= date('Y'); ?> by <span>mr. web designer</span> | all rights reserved!
+   &copy; Copyright @ <?= date('Y'); ?> by <span>PyBlog</span> | All rights reserved!
 </footer>
