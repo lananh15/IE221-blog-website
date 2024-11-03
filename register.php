@@ -71,7 +71,7 @@ if(isset($_POST['submit'])){
 <section class="form-container">
 
    <form action="" method="post">
-      <img src="uploaded_img/doraemon.webp" style="width:17%">
+      <a href="home.php"><img src="uploaded_img/doraemon.webp" style="width:17%"></a>
       <div class="divider">
          <span>OR</span>
       </div>
