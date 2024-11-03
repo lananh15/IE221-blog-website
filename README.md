@@ -13,17 +13,18 @@ Bạn dùng XAMPP vẫn được, nhưng nếu trong quá trình làm mà XAMPP 
 ![Screenshot 2024-11-03 211805](https://github.com/user-attachments/assets/abcb236c-a060-4255-b2ff-20f74c84e9b2)  
 Sau đó, thêm đoạn mã dưới đây vào dưới cùng của file **config.inc.php**:
 ```php
-/*
-* Second server connection configuration
-*/
+/**
+ * End of servers configuration
+ */
 $i++;
 // nhom2 server connection
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
-$cfg['Servers'][$i]['user'] = 'uvfsjpkeuye8bazp';
-$cfg['Servers'][$i]['password'] = 'ALy2Lj2zP1a30uUDxIBh';
+$cfg['Servers'][$i]['user'] = 'avnadmin';
+$cfg['Servers'][$i]['password'] = 'AVNS_rJlKFXve7NFmsh7WIVB';
 $cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
-$cfg['Servers'][$i]['host'] = 'bp6qb7pdxzzsqvcbshtc-mysql.services.clever-cloud.com';
+$cfg['Servers'][$i]['host'] = 'mysql-dev-blog-lananhngo685-dev-blog.h.aivencloud.com';
+$cfg['Servers'][$i]['port'] = 14981;
 $cfg['Lang'] = '';
 ```
 Sau khi thêm thì lưu file lại, rồi lên Chrome gõ url: http://localhost/phpmyadmin  
