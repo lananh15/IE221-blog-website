@@ -34,8 +34,8 @@ Sau khi thêm thì lưu file lại, rồi lên Chrome gõ url: http://localhost/
 - **Chọn server**: mysql-dev-blog-lananhngo685-dev-blog.h.aivencloud.com như hình dưới:
 ![Screenshot 2024-11-03 164559](https://github.com/user-attachments/assets/a581acbe-4e9a-47d5-93aa-7b4bcd9d4438)  
 
-Đăng nhập vào xong sẽ hiển thị hình dưới và có sẵn các table trong database:  
-![Screenshot 2024-11-03 164658](https://github.com/user-attachments/assets/469a89d0-e759-44f0-b4da-ef68fd259497)  
+Đăng nhập vào xong sẽ hiển thị hình dưới và có sẵn các table trong database (lưu ý chỉ chú ý 5 table là admin, comments, likes, posts, users):  
+![Screenshot 2024-11-03 223421](https://github.com/user-attachments/assets/26811936-fa64-46f0-a3bc-0de9cfdac4e4)  
 
 Khi làm thì ko cần tạo database nữa, nếu cần thiết thì chỉ tạo thêm table trong defaultdb là tiếp tục code được, tham khảo link https://hocwebchuan.com/tutorial/php/phpmyadmin_create_table.php#google_vignette để tạo table (defaultdb là tên database mà bên hosting free họ đặt).  
 
