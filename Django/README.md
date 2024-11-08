@@ -1,10 +1,10 @@
-## Vui lòng không chỉnh sửa hay đụng gì tới mấy cái code t sửa trong đây rồi nha 😞. Chỉ được thêm code mới vào hoặc xem thôi
+## Vui lòng không chỉnh sửa hay đụng gì tới mấy cái code t sửa trong thư mục Django này rồi nha 😞. Chỉ được thêm code mới vào hoặc xem thôi
 
 ### ⚠️ Chú ý
 Thư mục Django này là chỗ chính thức để tụi mình code đồ án (tức là chuyển mấy code php kia sang python thì sẽ làm trong thư mục này khi nào xong hết đồ án thì tụi mình xóa mấy file php bên ngoài thư mục Django này).  
 Nhưng mà hiện tại t mới fix bên phía người dùng thôi, còn admin thì chưa; còn về MVC với OOP thì t đang làm giữa chừng chưa xong mà nếu muốn coi web ở mức độ người dùng thì cx coi được rồi á (ngoại trừ trang posts.html với thanh tìm kiếm chưa xong).  
 
-### Xem web với code Python mới ✨
+### ✨ Xem web với code Python mới 
 **Bước 1:** Clone repo về, bật terminal trong VSCode (hoặc Pycharm), chạy câu lệnh:
 ```bash
 cd Django/project
