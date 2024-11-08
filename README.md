@@ -1,4 +1,6 @@
-# Database 🛢
+# 😀 Vào trong thư mục Django của repo này và đọc thử cái Lan Anh ghi nha
+
+# 🛢 Database
 Sử dụng database (đã có hosting) dùng chung cho nhóm.
 
 ## Tải XAMPP hoặc Laragon để sử dụng phpMyAdmin:
