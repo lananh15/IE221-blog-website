@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>User Comments</title>
+   
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+{% include 'user_header.html' %}
+
+{% if edit_comment %}
+   <section class="comment-edit-form">
+      <p>Edit your comment</p>
+      <form action="" method="POST">
+         {% csrf_token %}
+         <input type="hidden" name="edit_comment_id" value="{{ edit_comment.id }}">
+         <textarea name="comment_edit_box" required cols="30" rows="10" placeholder="Please enter your comment">{{ edit_comment.comment }}</textarea>
+         <button type="submit" class="inline-btn" name="edit_comment">Edit Comment</button>
+         <div class="inline-option-btn" onclick="window.location.href = '{% url 'user_comments' %}';">Cancel Edit</div>
+      </form>
+   </section>
+{% endif %}
+
+<section class="comments-container">
+   <h1 class="heading">Your Comments</h1>
+   <p class="comment-title">Your comments on the posts</p>
+   <div class="user-comments-container">
+      {% if comments %}
+         {% for comment in comments %}
+            <div class="show-comments">
+               <div class="post-title">From: 
+                  <span>{{ comment.post_id.title }}</span> 
+                  <a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+               </div>
+               <div class="comment-box">{{ comment.comment }}</div>
+               <form action="" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                  <button type="submit" class="inline-option-btn" name="open_edit_box">Edit Comment</button>
+                  <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete Comment</button>
+               </form>
+            </div>
+         {% endfor %}
+      {% else %}
+         <p class="empty">No comments added yet!</p>
+      {% endif %}
+   </div>
+</section>
+
+{% include 'footer.html' %}
+
+<script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

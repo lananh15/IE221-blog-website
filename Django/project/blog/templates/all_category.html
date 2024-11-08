@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Category</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+   
+{% include 'user_header.html' %}
+
+<section class="categories">
+
+   <h1 class="heading">Post categories</h1>
+
+   <div class="box-container">
+      <div class="box"><span>01</span><a href="category.php?category=nature">Python</a></div>
+      <div class="box"><span>02</span><a href="category.php?category=eduction">C++</a></div>
+      <div class="box"><span>03</span><a href="category.php?category=pets and animals">C#</a></div>
+   </div>
+
+</section>
+
+{% include 'footer.html' %}
+
+<!-- custom js file link  -->
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

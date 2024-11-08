@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Search</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+
+
+{% if posts %}
+<section class="posts-container">
+
+   <div class="box-container">
+
+      {% for post in posts %}
+      <form class="box" method="post">
+         {% csrf_token %}
+         <input type="hidden" name="post_id" value="{{ post.id }}">
+         <input type="hidden" name="admin_id" value="{{ post.admin_id }}">
+         <div class="post-admin">
+            <i class="fas fa-user"></i>
+            <div>
+               <a href="{% url 'author_posts' author=post.name %}">{{ post.name }}</a>
+               <div>{{ post.date }}</div>
+            </div>
+         </div>
+
+         {% if post.image %}
+         <img src="{% static 'uploaded_img/' %}{{ post.image }}" class="post-image" alt="">
+         {% endif %}
+         <div class="post-title">{{ post.title }}</div>
+         <div class="post-content content-150">{{ post.content }}</div>
+         <a href="{% url 'view_post' post_id=post.id %}" class="inline-btn">read more</a>
+         <a href="{% url 'category' category=post.category %}" class="post-cat"> 
+             <i class="fas fa-tag"></i> 
+             <span>{{ post.category }}</span>
+         </a>
+
+         <!-- Icons for comments and likes -->
+         <div class="icons">
+            {% with total_comments=post.comments.count %}
+                <a href="{% url 'view_post' post_id=post.id %}"><i class="fas fa-comment"></i><span>({{ total_comments }})</span></a>
+            {% endwith %}
+            <!-- Handle likes here -->
+            {% with total_likes=post.likes.count %}
+                <button type="submit" name="like_post"><i class="fas fa-heart"></i><span>({{ total_likes }})</span></button>
+            {% endwith %}
+         </div>
+
+      </form>
+      {% endfor %}
+   </div>
+
+</section>
+
+{% else %}
+<section><p class="empty">No result found!</p></section>
+{% endif %}
+
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

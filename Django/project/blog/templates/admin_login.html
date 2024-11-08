@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Admin Login</title>
+
+   <!-- Font Awesome CDN link -->
+    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body style="padding-left: 0 !important;">
+
+{% if message %}
+<div class="message">
+   <span>{{ message }}</span>
+   <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+</div>
+{% endif %}
+
+<!-- Admin login form section starts -->
+<section class="form-container">
+   <form action="" method="POST">
+      {% csrf_token %}
+      <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
+      <div class="divider">
+         <span>OR</span>
+      </div>
+
+      <label class="label-form">Username</label>
+      <input type="text" name="name" maxlength="20" required class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+      <label class="label-form">Password</label>
+      <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="submit" value="Login" name="submit" class="btn">
+   </form>
+</section>
+<!-- Admin login form section ends -->
+
+</body>
+</html>

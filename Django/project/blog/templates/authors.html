@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Authors</title>
+
+   <!-- Font Awesome CDN link -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+   
+{% include 'user_header.html' %}
+
+<section class="simple-content">
+
+   <h1 class="heading">Authors</h1>
+
+   <div class="box-container">
+
+      {% if author_stats %}
+         {% for author in author_stats %}
+         <div class="box">
+            <p>Author : <span>{{ author.name }}</span></p>
+            <p>Total posts : <span>{{ author.total_posts }}</span></p>
+            <p>Posts likes : <span>{{ author.total_likes }}</span></p>
+            <p>Posts comments : <span>{{ author.total_comments }}</span></p>
+            <a href="{% url 'author_posts' author.name %}" class="btn">View posts</a>
+         </div>
+         {% endfor %}
+      {% else %}
+         <p class="empty">No authors found</p>
+      {% endif %}
+
+   </div>
+      
+</section>
+
+{% include 'footer.html' %}
+
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

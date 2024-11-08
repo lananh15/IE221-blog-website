@@ -1,0 +1,53 @@
+{% if message %}
+   <script>
+      alert("{{ message }}");
+   </script>
+{% endif %}
+
+<header class="header">
+   <section class="flex">
+
+      <a href="{% url 'home' %}" class="logo">PyBlog</a>
+
+      <form action="{% url 'search' %}" method="POST" class="search-form">
+         {% csrf_token %}
+         <input type="text" name="search_box" class="box" maxlength="100" placeholder="Search..." required>
+         <button type="submit" class="fas fa-search" name="search_btn"></button>
+      </form>
+
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="search-btn" class="fas fa-search"></div>
+         <div id="user-btn" class="fas fa-user"></div>
+      </div>
+
+      <nav class="navbar">
+         <a href="{% url 'home' %}"> <i class="fas fa-angle-right"></i> Home</a>
+         <a href="{% url 'posts' %}"> <i class="fas fa-angle-right"></i> Posts</a>
+         <a href="{% url 'authors' %}"> <i class="fas fa-angle-right"></i> Authors</a>
+         <a href="{% url 'contact' %}"> <i class="fas fa-angle-right"></i> Contact</a>
+         <a href="{% url 'about' %}"> <i class="fas fa-angle-right"></i> About</a>
+      </nav>
+
+      <div class="profile">
+         {% if user_id %}
+            <p class="name">{{ user_name }}</p>
+            <a href="{% url 'update_profile' %}" class="btn">Update profile</a>
+            <a href="{% url 'user_logout' %}" onclick="return confirm('Logout from this website?');" class="delete-btn">Logout</a>
+         {% else %}
+            <p class="name">Please login first!</p>
+            <a href="{% url 'login' %}" class="option-btn">Login</a>
+         {% endif %}
+      </div>
+
+   </section>
+
+   {% if messages %}
+      {% for message in messages %}
+      <div class="message">
+         <span>{{ message }}</span>
+         <i class="fas fa-times" onclick="$(this).parent().remove();"></i>
+      </div>
+      {% endfor %}
+   {% endif %}
+</header>

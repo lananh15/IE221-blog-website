@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Update profile</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+
+{% include 'user_header.html' %}
+
+<section class="form-container">
+
+   <form action="" method="post">
+      {% csrf_token %}
+      <h3>Update profile</h3>
+      <input type="text" name="name" placeholder="{{ user_name }}" class="box" maxlength="50">
+      <input type="email" name="email" placeholder="{{ user_email }}" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="password" name="old_pass" placeholder="Enter your current password" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="password" name="new_pass" placeholder="Enter your new password" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="password" name="confirm_pass" placeholder="Confirm your new password" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="submit" value="Update" name="submit" class="btn">
+   </form>
+
+</section>
+
+{% include 'footer.html' %}
+
+<!-- custom js file link  -->
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>
