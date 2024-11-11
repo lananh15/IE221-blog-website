@@ -31,20 +31,26 @@ user_id = request.user_id
 ```
 Giống trong file Django/project/blog/views/base.py (dòng thứ 6):
 ```python
-from django.contrib.auth.models import User
+from ..models import Admin, User
 
 class BaseView:
     def __init__(self, request):
         self.request = request
-        self.user_id = request.user.id if request.user.is_authenticated else None
+        self.user_id = request.session.get('user_id', None)
         self.user = User.objects.filter(id=self.user_id).first() if self.user_id else None
         self.user_name = self.user.name if self.user else None
         self.user_email = self.user.email if self.user else None
+
+        self.admin_id = request.session.get('admin_id', None)
+        self.admin = Admin.objects.filter(id=self.admin_id).first() if self.admin_id else None
+        self.admin_name = self.admin.name if self.admin else None
 
         self.context = {
             'user_id': self.user_id,
             'user_name': self.user_name,
             'user_email': self.user_email,
+            'admin_id': self.admin_id,
+            'admin_name': self.admin_name,
         }
 ```
 
@@ -53,6 +59,7 @@ Nên là khi mọi người copy dính dòng code gọi này của t khi hỏi c
 Tuy nhiên, base.py này chứa class t tính để cho mấy class khác kế thừa (do nó chứa thông tin của user hiện tại duyệt web và bất kì trang nào cũng liên quan đến user nên cần lấy id, name của user để hiện lên header...) => Nhờ cái này mà mấy class kế thừa sau nếu muốn lấy id của user thì chỉ cần gọi:
 ```bash
 self.user_id
+# Hoặc gọi admin_id thì dùng self.admin_id
 ```
 
 ### 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
