@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Admins accounts</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+
+<!-- admins accounts section starts  -->
+
+<section class="accounts">
+
+   <h1 class="heading">admins account</h1>
+
+   <div class="box-container">
+
+   <div class="box" style="order: -2;">
+      <p>Register new admin</p>
+      <a href="register_admin.php" class="option-btn" style="margin-bottom: .5rem;">Register</a>
+   </div>
+
+    {% if admins %}
+        {% for item in admins %}
+        <div class="box" style="order: {% if item.admin.id == admin_id %}echo '-1';{% endif %}">
+            <p> Admin ID : <span>{{ item.admin.id }}</span> </p>
+            <p> Username : <span>{{ item.admin.name }}</span> </p>
+            <p> Total posts : <span>{{ item.total_admin_posts }}</span> </p>
+            <div class="flex-btn">
+                {% if item.admin.id == admin_id %}
+                    <a href="{% url 'admin_update_profile' admin_name %}" class="option-btn" style="margin-bottom: .5rem;">Update</a>
+                    <form action="" method="POST">
+                    <input type="hidden" name="post_id" value="{{ item.admin.id }}" on>
+                    <button type="submit" name="delete"onclick="return confirm('Delete the account?');" class="delete-btn" style="margin-bottom: .5rem;">Delete</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="empty">No accounts available</p>
+    {% endif %}
+
+   </div>
+
+</section>
+
+<!-- admins accounts section ends -->
+<!-- custom js file link  -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>

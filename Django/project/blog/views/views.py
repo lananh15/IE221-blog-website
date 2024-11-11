@@ -49,6 +49,27 @@ def login(request):
 def admin_login(request):
     return AdminsViews(request).admin_login()
 
+def admin_logout(request):
+    return AdminsViews(request).admin_logout()
+
+def dashboard(request):
+    return AdminsViews(request).dashboard()
+
+def admin_update_profile(request, admin_name):
+    return AdminsViews(request).admin_update_profile(admin_name)
+
+def admin_view_post(request):
+    return AdminsViews(request).admin_view_post()
+
+def get_users_accounts(request):
+    return AdminsViews(request).get_users_accounts()
+
+def get_admin_accounts(request):
+    return AdminsViews(request).get_admin_accounts()
+
+def get_comments(request):
+    return AdminsViews(request).get_comments()
+
 
 def register(request):
     return UserViews(request).register()

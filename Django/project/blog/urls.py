@@ -16,8 +16,15 @@ urlpatterns = [
     path('about/', views.load_about, name='about'),
 
     path('admin-login/', views.admin_login, name='admin_login'),
+    path('admin-logout/', views.admin_logout, name='admin_logout'),
+    path('update-profile/<str:admin_name>/', views.admin_update_profile, name='admin_update_profile'),
+    path('view-post/', views.admin_view_post, name='admin_view_post'),
+    path('users-accounts', views.get_users_accounts, name='users_accounts'),
+    path('admin-accounts', views.get_admin_accounts, name='admin_accounts'),
+    path('comments', views.get_comments, name='comments'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('author/<str:author>/', views.load_author_posts, name='author_posts'),
-    path('update_profile', views.update_profile, name='update_profile'),
+    path('update-profile', views.update_profile, name='update_profile'),
     
     path('user_likes', views.user_likes, name='user_likes'),
     path('user_comments', views.user_comments, name='user_comments'),

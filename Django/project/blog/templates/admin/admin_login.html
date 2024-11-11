@@ -27,9 +27,7 @@
    <form action="" method="POST">
       {% csrf_token %}
       <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
-      <div class="divider">
-         <span>OR</span>
-      </div>
+      <br><br>
 
       <label class="label-form">Username</label>
       <input type="text" name="name" maxlength="20" required class="box" oninput="this.value = this.value.replace(/\s/g, '')">

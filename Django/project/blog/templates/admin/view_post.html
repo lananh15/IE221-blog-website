@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Posts</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+
+<section class="show-posts">
+
+   <h1 class="heading">your posts</h1>
+
+   <div class="box-container">
+   {% if posts %}
+      {% for item in posts %}
+      <form method="post" class="box">
+         <input type="hidden" name="post_id" value="{{ item.post.id }}">
+         {% if item.post.image %}
+            <img src="{{ item.post.image.url }}" class="image" alt="">
+         {% endif %}
+         <div class="status" style="background-color:{% if item.post.status == 'active' %}limegreen; {% else %}coral;{% endif %}">{{ item.post.status }}</div>
+            <div class="title">{{ item.post.title }}</div>
+         <div class="posts-content">{{ item.post.content }}</div>
+         <div class="icons">
+            <div class="likes"><i class="fas fa-heart"></i><span>{{ item.total_post_likes }}</span></div>
+            <div class="comments"><i class="fas fa-comment"></i><span>{{ item.total_post_comments }}</span></div>
+         </div>
+         <div class="flex-btn">
+            <a href="edit_post.php?id=<?= $post_id; ?>" class="option-btn">edit</a>
+            <button type="submit" name="delete" class="delete-btn" onclick="return confirm('Delete this post?');">delete</button>
+         </div>
+         <a href="read_post.php?post_id=<?= $post_id; ?>" class="btn">view post</a>
+      </form>
+         {% endfor %}
+      {% else %}
+         <p class="empty">No posts added yet! <a href="add_posts.php" class="btn" style="margin-top:1.5rem;">add post</a></p>';
+      {% endif %}
+   </div>
+
+
+</section>
+<!-- custom js file link  -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>

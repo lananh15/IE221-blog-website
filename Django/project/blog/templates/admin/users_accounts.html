@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Users accounts</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+
+<!-- users accounts section starts  -->
+
+<section class="accounts">
+
+   <h1 class="heading">users account</h1>
+
+   <div class="box-container">
+    {% if users %}
+        {% for item in users %}
+            <div class="box">
+                <p> User ID : <span>{{ item.user.id }}</span> </p>
+                <p> Username : <span>{{ item.user.name }}</span> </p>
+                <p> Total comments : <span>{{ item.total_user_comments }}</span> </p>
+                <p> Total likes : <span>{{ item.total_user_likes }}</span> </p>
+            </div>
+        {% endfor %}
+   {% else %}
+        <p class="empty">No accounts available</p>
+   {% endif %}
+
+   </div>
+
+</section>
+
+<!-- users accounts section ends -->
+
+<!-- custom js file link  -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>

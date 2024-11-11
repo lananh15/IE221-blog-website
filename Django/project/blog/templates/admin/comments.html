@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Users accounts</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+
+<section class="comments">
+
+   <h1 class="heading">posts comments</h1>
+   
+   <p class="comment-title">Post comments</p>
+   <div class="box-container">
+    {% if comments %}
+        {% for item in comments %}
+        <div class="post-title"> From : <span>{{ item.post.title }}</span> <a href="read_post.php?post_id=<?= $fetch_posts['id']; ?>" >view post</a></div>
+    <div class="box">
+        <div class="user">
+            <i class="fas fa-user"></i>
+            <div class="user-info">
+                <span>{{ item.comment.user_name }}</span>
+                <div>{{ item.comment.date }}</div>
+            </div>
+        </div>
+        <div class="text">{{ item.comment.comment }}</div>
+        <form action="" method="POST">
+            <input type="hidden" name="comment_id" value="{{ item.comment.id }}">
+            <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete comment</button>
+        </form>
+    </div>
+    {% endfor %}
+   {% else %}
+       <p class="empty">No comments added yet!</p>
+   {% endif %}
+   </div>
+
+</section>
+
+
+
+<!-- custom js file link  -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>

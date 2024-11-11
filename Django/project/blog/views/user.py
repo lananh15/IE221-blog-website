@@ -30,6 +30,7 @@ class UserViews(BaseView):
                 hashed_password = hashlib.sha1(password.encode()).hexdigest()
                 if hashed_password == user.password:
                     self.request.session['user_id'] = user.id
+                    print(self.user_id)
                     return redirect('home')
                 else:
                     message = 'Incorrect username or password!'
@@ -159,7 +160,7 @@ class UserViews(BaseView):
         }
 
         if self.user_id:
-            context['user_name'] = self.user.name
+            context['user_name'] = self.user_name
             context['user_comments'] = Comment.objects.filter(user_id=self.user_id).count()
             context['user_likes'] = Like.objects.filter(user_id=self.user_id).count()
 

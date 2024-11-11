@@ -49,7 +49,7 @@
          </div>
          
          {% if post.image %}
-         <img src="{% static 'image/' %}{{ post.image }}" class="post-image" alt="">
+         <img src="{{ post.image.url }}" class="post-image" alt="">
          {% endif %}
          <div class="post-title">{{ post.title }}</div>
          <div class="post-content">{{ post.content }}</div>
