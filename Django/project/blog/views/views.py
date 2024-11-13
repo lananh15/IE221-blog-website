@@ -3,20 +3,61 @@ from ..models import Admin, User, Post, Like, Comment
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.utils import timezone
+from django.views import View
 
 from .posts import PostsViews
-from .user import UserViews
+from .users import UserViews
 from .posts import PostsViews
-from .admins import AdminsViews
+from .admins import AdminViews
+
+# Các xử lý liên quan User
+def login(request):
+    """Đăng nhập"""
+    return UserViews(request).login()
+
+def register(request):
+    """Đăng ký"""
+    return UserViews(request).register()
+
+def load_contact(request):
+    """Load trang Contact"""
+    return UserViews(request).load_contact()
+
+def load_about(request):
+    """Load trang About"""
+    return UserViews(request).load_about()
 
 def user_header(request):
+    """Load phần Header đối với User"""
     return UserViews(request).user_header()
 
 def load_home(request):
+    """Load trang Home"""
     return UserViews(request).load_home()
 
 def like_post(request, post_id):
     return UserViews(request).like_post(post_id)
+
+def user_likes(request):
+    """Hiển thị tất cả bài viết mà người dùng đã thích"""
+    return UserViews(request).user_likes()
+
+def user_comments(request):
+    """Hiển thị thông tin các comment mà người dùng đã comment"""
+    return UserViews(request).user_comments()
+
+def user_logout(request):
+    """Đăng xuất"""
+    return UserViews(request).user_logout()
+
+def update_profile(request):
+    """Cập nhật thông tin cá nhân người dùng"""
+    return UserViews(request).update_profile()
+
+def load_author_posts(request, author):
+    """Hiển thị tất cả bài viết của author tương ứng"""
+    return UserViews(request).load_author_posts(author)
+
 
 
 def search(request):
@@ -37,65 +78,58 @@ def search(request):
     
     return render(request, 'search.html', context)
 
+
+# Các xử lý liên quan Posts
 def load_posts(request):
+    """Hiển thị tất cả các bài viết có trên website"""
     return PostsViews(request).load_posts()
 
 def load_authors(request):
-    return AdminsViews(request).load_authors()
+    """Hiển thị tất cả các author trên website"""
+    return AdminViews(request).load_authors()
 
-def login(request):
-    return UserViews(request).login()
+def load_all_category(request):
+    """Hiển thị tất cả category"""
+    return PostsViews(request).load_all_category()
 
-def admin_login(request):
-    return AdminsViews(request).admin_login()
-
-def admin_logout(request):
-    return AdminsViews(request).admin_logout()
-
-def dashboard(request):
-    return AdminsViews(request).dashboard()
-
-def admin_update_profile(request, admin_name):
-    return AdminsViews(request).admin_update_profile(admin_name)
-
-def admin_view_post(request):
-    return AdminsViews(request).admin_view_post()
-
-def get_users_accounts(request):
-    return AdminsViews(request).get_users_accounts()
-
-def get_admin_accounts(request):
-    return AdminsViews(request).get_admin_accounts()
-
-def get_comments(request):
-    return AdminsViews(request).get_comments()
-
-
-def register(request):
-    return UserViews(request).register()
-
-
-def load_contact(request):
-    return UserViews(request).load_contact()
-
-def load_about(request):
-    return UserViews(request).load_about()
-
-def load_author_posts(request, author):
-    return AdminsViews(request).load_author_posts(author)
-
-def user_logout(request):
-    return UserViews(request).user_logout()
-
-def update_profile(request):
-    return UserViews(request).update_profile()
+def load_category(request, category_name):
+    """Hiển thị các bài post tương ứng với category được chọn"""
+    return PostsViews(request).load_category(category_name)
 
 def view_post(request, post_id):
+    """Hiển thị bài viết được chọn"""
     return PostsViews(request).view_post(post_id)
 
 
-def user_likes(request):
-    return UserViews(request).user_likes()
+# Các xử lý liên quan Admins
+def admin_login(request):
+    """Đăng nhập (Admin)"""
+    return AdminViews(request).admin_login()
 
-def user_comments(request):
-    return UserViews(request).user_comments()
+def admin_logout(request):
+    """Đăng xuất (Admin)"""
+    return AdminViews(request).admin_logout()
+
+def dashboard(request):
+    """Hiển thị trang Dashboard"""
+    return AdminViews(request).dashboard()
+
+def admin_update_profile(request, admin_name):
+    """Cập nhật thông tin Admin"""
+    return AdminViews(request).admin_update_profile(admin_name)
+
+def admin_view_post(request):
+    """Xem tất cả bài blog của admin"""
+    return AdminViews(request).admin_view_post()
+
+def get_users_accounts(request):
+    """Lấy thông tin các User Account"""
+    return AdminViews(request).get_users_accounts()
+
+def get_admin_accounts(request):
+    """Lấy thông tin các Admin Account"""
+    return AdminViews(request).get_admin_accounts()
+
+def get_comments(request):
+    """Lấy thông tin các comment"""
+    return AdminViews(request).get_comments()

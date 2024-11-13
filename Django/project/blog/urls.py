@@ -11,7 +11,10 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.user_logout, name='user_logout'),
     path('register/', views.register, name='register'),
-    
+
+
+    path('all-category/', views.load_all_category, name='all_category'),
+    path('category/<str:category_name>/', views.load_category, name='category'),
     path('contact/', views.load_contact, name='contact'),
     path('about/', views.load_about, name='about'),
 

@@ -175,7 +175,7 @@
                         <div class="post-title">{{ item.post.title }}</div>
                         <div class="post-content content-150">{{ item.post.content }}</div>
                         <a href="{% url 'view_post' item.post.id %}" class="inline-btn">Read more</a>
-                        <a href="/" class="post-cat">
+                        <a href="{% url 'category' item.post.category %}" class="post-cat">
                             <i class="fas fa-tag"></i>
                             <span>{{ item.post.category }}</span>
                         </a>

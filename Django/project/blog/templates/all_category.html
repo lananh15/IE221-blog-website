@@ -24,9 +24,9 @@
    <h1 class="heading">Post categories</h1>
 
    <div class="box-container">
-      <div class="box"><span>01</span><a href="category.php?category=nature">Python</a></div>
-      <div class="box"><span>02</span><a href="category.php?category=eduction">C++</a></div>
-      <div class="box"><span>03</span><a href="category.php?category=pets and animals">C#</a></div>
+      <div class="box"><span>01</span><a href="{% url 'category' category_name='python' %}">Python</a></div>
+      <div class="box"><span>02</span><a href="{% url 'category' category_name='c++' %}">C++</a></div>
+      <div class="box"><span>03</span><a href="{% url 'category' category_name='c#' %}">C#</a></div>
    </div>
 
 </section>

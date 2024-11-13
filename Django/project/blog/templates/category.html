@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Category</title>
+
+   <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+   
+{% include 'user_header.html' %}
+
+
+<section class="posts-container">
+
+   <h1 class="heading">Post categories</h1>
+
+   <div class="box-container">
+      {% if posts %}
+        {% for item in posts %}
+        <form class="box" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ item.post.id }}">
+            <input type="hidden" name="admin_id" value="{{ item.post.admin_id }}">
+            <div class="post-admin">
+                <i class="fas fa-user"></i>
+                <div>
+                <a href="{% url 'author_posts' item.post.name %}">{{ item.post.name }}</a>
+                <div>{{ item.post.date }}</div>
+                </div>
+            </div>
+            
+            {% if item.post.image %}
+            <img src="{{ item.post.image.url }}" class="post-image" alt="">
+            {% endif %}
+            <div class="post-title">{{ item.post.title }}</div>
+            <div class="post-content content-150">{{ item.post.content }}</div>
+            <a href="{% url 'view_post' item.post.id %}" class="inline-btn">read more</a>
+            <div class="icons">
+                <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_post_comments }})</span></a>
+                <button type="submit" name="like_post"><i class="fas fa-heart" style="{% if item.is_liked_by_user %}color:red;{% endif %}"></i><span>({{ item.total_post_likes }})</span></button>
+            </div>
+        
+        </form>
+        {% endfor %} 
+      {% else %}
+        <p class="empty">No posts found for this category!</p>
+      {% endif %}
+   </div>
+
+</section>
+
+
+{% include 'footer.html' %}
+
+<!-- custom js file link  -->
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

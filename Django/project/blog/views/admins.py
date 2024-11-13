@@ -5,13 +5,18 @@ from django.contrib.auth import logout
 from django.utils import timezone
 
 from .base import BaseView
+from .comments import CommentViews
+from .likes import LikeViews
 
 import hashlib
 import os
 
-class AdminsViews(BaseView):
+class AdminViews(BaseView):
     def __init__(self, request):
         super().__init__(request)
+        self.comment_handler = CommentViews(self.user_id)
+        self.like_handler = LikeViews(self.user_id)
+
         
     def admin_login(self):
         """Admin đăng nhập"""
@@ -57,33 +62,6 @@ class AdminsViews(BaseView):
         
         return render(self.request, 'authors.html', context)
     
-    def load_author_posts(self, author):
-        """Hiển thị các bài post của tác giả tương ứng"""
-        posts = Post.objects.filter(name=author, status='active')
-
-        post_data = []
-        for post in posts:
-            total_comments = Comment.objects.filter(post_id=post.id).count()
-            total_likes = Like.objects.filter(post_id=post.id).count()
-            if self.user_id:
-                is_liked = Like.objects.filter(user_id=self.user_id, post_id=post.id).exists()
-            else:
-                is_liked = False
-
-            post_data.append({
-                'total_comments': total_comments,
-                'total_likes': total_likes,
-                'is_liked': is_liked,
-                'post': post
-            })
-        context = {
-            'posts': post_data,
-            'author': author,
-            'user_id': self.user_id,
-            'user_name': self.user_name,
-        }  
-
-        return render(self.request, 'author_posts.html', context)
 
     def admin_logout(self):
         """Admin đăng xuất"""
@@ -186,8 +164,8 @@ class AdminsViews(BaseView):
             post_data = []
 
             for post in select_posts:
-                total_post_comments = Comment.objects.filter(post_id=post.id).count()
-                total_post_likes = Like.objects.filter(post_id=post.id).count()
+                total_post_comments = self.comment_handler.get_post_total_comments(post)
+                total_post_likes = self.like_handler.get_post_total_likes(post)
                 post_data.append({
                     'post': post,
                     'total_post_comments': total_post_comments,
@@ -269,7 +247,7 @@ class AdminsViews(BaseView):
 
 
     def get_comments(self):
-        """Lấy thông tin các comment """
+        """Lấy thông tin các comment"""
         admin_id = self.admin_id
         admin_name = self.admin_name
         message = ''

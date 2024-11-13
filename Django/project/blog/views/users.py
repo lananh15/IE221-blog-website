@@ -6,12 +6,30 @@ from django.utils import timezone
 from django.db.models import Count
 
 from .base import BaseView
+from .comments import CommentViews
+from .likes import LikeViews
+from .admins import AdminViews
 
 import hashlib
 
 class UserViews(BaseView):
     def __init__(self, request):
         super().__init__(request)
+        self.comment_handler = CommentViews(self.user_id)
+        self.like_handler = LikeViews(self.user_id)
+
+    def user_header(self):
+        """Load header đối với user"""
+        print(self.user_id)       
+        return render(self.request, 'user_header.html', self.context)
+
+    def load_contact(self):
+        """Load trang Contact"""
+        return render(self.request, 'contact.html', self.context)
+
+    def load_about(self):
+        """Load trang About"""
+        return render(self.request, 'about.html', self.context)
 
     def user_logout(self):
         """Đăng xuất"""
@@ -24,7 +42,7 @@ class UserViews(BaseView):
         if self.request.method == 'POST':
             email = self.request.POST.get('email')
             password = self.request.POST.get('pass')
-
+    
             try:
                 user = User.objects.get(email=email)
                 hashed_password = hashlib.sha1(password.encode()).hexdigest()
@@ -64,19 +82,6 @@ class UserViews(BaseView):
                     return redirect('home')
 
         return render(self.request, 'register.html', {'message': message if 'message' in locals() else ''})
-
-    def user_header(self):
-        """Load header đối với user"""
-        print(self.user_id)       
-        return render(self.request, 'user_header.html', self.context)
-
-    def load_contact(self):
-        """Load trang Contact"""
-        return render(self.request, 'contact.html', self.context)
-
-    def load_about(self):
-        """Load trang About"""
-        return render(self.request, 'about.html', self.context)
     
     def update_profile(self):
         """Chỉnh sửa thông tin cá nhân"""
@@ -125,15 +130,13 @@ class UserViews(BaseView):
         post_data = []
 
         if self.user_id:
-            likes = Like.objects.filter(user_id=self.user_id)
-
+            likes = self.like_handler.get_user_likes()
             if likes.exists():
                 post_ids = likes.values_list('post_id', flat=True)
                 posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
                     total_likes=Count('like'),
                     total_comments=Count('comment')
                 )
-
                 for post in posts:
                     post_data.append({
                         'post': post,
@@ -161,16 +164,16 @@ class UserViews(BaseView):
 
         if self.user_id:
             context['user_name'] = self.user_name
-            context['user_comments'] = Comment.objects.filter(user_id=self.user_id).count()
-            context['user_likes'] = Like.objects.filter(user_id=self.user_id).count()
+            context['user_comments'] = self.comment_handler.get_user_comments().count()
+            context['user_likes'] = self.like_handler.get_user_likes().count()
 
         posts = Post.objects.filter(status='active')[:4]
         post_data = []
 
         for post in posts:
-            total_comments = Comment.objects.filter(post_id=post.id).count()
-            total_likes = Like.objects.filter(post_id=post.id).count()
-            is_liked_by_user = Like.objects.filter(user_id=self.user_id, post_id=post.id).exists()
+            total_comments = self.comment_handler.get_post_total_comments(post)
+            total_likes = self.like_handler.get_post_total_likes(post)
+            is_liked_by_user = self.like_handler.user_liked_post(post.id)
             author = Admin.objects.filter(id=post.admin_id).first()
             post_data.append({
                 'post': post,
@@ -198,22 +201,22 @@ class UserViews(BaseView):
                 edit_comment_id = self.request.POST.get('edit_comment_id')
                 comment_edit_box = self.request.POST.get('comment_edit_box')
 
-                if Comment.objects.filter(comment=comment_edit_box, id=edit_comment_id).exists():
+                if self.comment_handler.comment_exists(comment_edit_box, edit_comment_id):
                     message = "Comment already added!"
                 else:
-                    Comment.objects.filter(id=edit_comment_id, user_id=self.user_id).update(comment=comment_edit_box)
+                    self.comment_handler.update_comment(edit_comment_id, comment_edit_box)
                     message = "Your comment edited successfully!"
 
             elif 'delete_comment' in self.request.POST:
                 delete_comment_id = self.request.POST.get('comment_id')
-                Comment.objects.filter(id=delete_comment_id, user_id=self.user_id).delete()
-                message = "Comment deleted successfully!"
+                if self.comment_handler.delete_comment(delete_comment_id):
+                    message = "Comment deleted successfully!"
 
             elif 'open_edit_box' in self.request.POST:
                 comment_id = self.request.POST.get('comment_id')
-                edit_comment = Comment.objects.filter(id=comment_id, user_id=self.user_id).first()
+                edit_comment = self.comment_handler.get_current_comments(comment_id)
 
-        comments = Comment.objects.filter(user_id=self.user_id)
+        comments = self.comment_handler.get_user_comments()
 
         context = {
             'comments': comments,
@@ -235,8 +238,35 @@ class UserViews(BaseView):
         if like:
             like.delete()
         else:
-            Like.objects.create(user_id=self.user, admin_id=admin, post_id=post)
+            self.like_handler.like_post(self.user, admin, post)
 
         return redirect(self.request.META.get('HTTP_REFERER'))
 
 
+    def load_author_posts(self, author):
+        """Hiển thị các bài post của tác giả tương ứng"""
+        posts = Post.objects.filter(name=author, status='active')
+
+        post_data = []
+        for post in posts:
+            total_comments = self.comment_handler.get_post_total_comments(post)
+            total_likes = self.like_handler.get_post_total_likes(post)
+            if self.user_id:
+                is_liked = self.like_handler.user_liked_post(post.id)
+            else:
+                is_liked = False
+
+            post_data.append({
+                'total_comments': total_comments,
+                'total_likes': total_likes,
+                'is_liked': is_liked,
+                'post': post
+            })
+        context = {
+            'posts': post_data,
+            'author': author,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }  
+
+        return render(self.request, 'author_posts.html', context)

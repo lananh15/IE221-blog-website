@@ -38,8 +38,8 @@
                </div>
             </div>
 
-            {% if post.image %}
-               <img src="{% static 'image/' %}{{ item.post.image.url }}" class="post-image" alt="">
+            {% if item.post.image %}
+               <img src="{{ item.post.image.url }}" class="post-image" alt="">
             {% endif %}
             
             <div class="post-title">{{ item.post.title }}</div>
@@ -51,10 +51,10 @@
             </a>
 
             <div class="icons">
-               <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.post.total_comments }})</span></a>
+               <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
                <button type="submit" name="like_post">
-                   <i class="fas fa-heart" style="{% if item.post.is_liked_by_user %}color: red;{% endif %}"></i>
-                   <span>({{ item.post.total_likes }})</span>
+                   <i class="fas fa-heart" style="{% if item.is_liked_by_user %}color: red;{% endif %}"></i>
+                   <span>({{ item.total_likes }})</span>
                </button>
             </div>
          </form>

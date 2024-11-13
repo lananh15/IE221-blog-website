@@ -5,21 +5,58 @@ from django.contrib.auth import logout
 from django.utils import timezone
 
 from .base import BaseView
+from .comments import CommentViews
+from .likes import LikeViews
 
 class PostsViews(BaseView):
     
     def __init__(self, request):
         super().__init__(request)
+        self.comment_handler = CommentViews(self.user_id)
+        self.like_handler = LikeViews(self.user_id)
 
-    # Hiển thị tất cả các bài viết
+
+    def load_all_category(self):
+        """Hiển thị tất cả category"""
+        context = {
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+        return render(self.request, 'all_category.html', context)
+    
+    def load_category(self, category_name):
+        """Hiển thị tất cả bài viết thuộc category"""
+        posts = Post.objects.filter(category=category_name, status='active')
+        post_data = []
+        is_liked_by_user = None
+        if posts.exists():
+            for post in posts:
+                total_post_comments = self.comment_handler.get_post_total_comments(post)
+                total_post_likes = self.like_handler.get_post_total_likes(post)
+                is_liked_by_user = Like.objects.filter(user_id=self.user_id, post_id=post.id).count() > 0
+                post_data.append({
+                    'post': post,
+                    'total_post_comments': total_post_comments,
+                    'total_post_likes': total_post_likes,
+                    'is_liked_by_user': is_liked_by_user,
+                })
+
+        context = {
+            'posts': post_data,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+        return render(self.request, 'category.html', context)
+    
     def load_posts(self):
+        """Hiển thị tất cả các bài viết"""
         posts = Post.objects.filter(status='active')
 
         post_data = []
         for post in posts:
-            total_comments = Comment.objects.filter(post_id=post.id).count()
-            total_likes = Like.objects.filter(post_id=post.id).count()
-            is_liked = Like.objects.filter(user_id=self.user_id, post_id=post.id).exists()
+            total_comments = self.comment_handler.get_post_total_comments(post)
+            total_likes = self.like_handler.get_post_total_likes(post)
+            is_liked = self.like_handler.user_liked_post(post.id)
             post_data.append({
                 'total_comments': total_comments,
                 'total_likes' : total_likes,
@@ -30,55 +67,45 @@ class PostsViews(BaseView):
         context = {
             'posts': post_data,
             'user_id': self.user_id,
+            'user_name': self.user_name,
         }
         
         return render(self.request, 'posts.html', context)
 
-    # Hiển thị bài viết có id = post_id
+    
     def view_post(self, post_id):
+        """Hiển thị bài viết có id = post_id"""
         post = Post.objects.get(id=post_id, status='active')
         edit_comment = None
         if self.request.method == 'POST' and self.user_id:
             if 'add_comment' in self.request.POST:
                 comment = self.request.POST.get('comment')
-                Comment.objects.create(
-                    post_id=post,
-                    admin_id=post.admin,
-                    user_id=self.user,
-                    comment=comment,
-                    date=timezone.now(),
-                )
-            
+                self.comment_handler.add_comment(post, comment, self.user)
+                
             elif 'edit_comment' in self.request.POST:
                 edit_comment_id = self.request.POST.get('edit_comment_id')
                 comment_edit_box = self.request.POST.get('comment_edit_box')
-
-                comment_to_edit = Comment.objects.filter(id=edit_comment_id).first()
-                if comment_to_edit:
-                    comment_to_edit.comment = comment_edit_box
-                    comment_to_edit.save()
+                self.comment_handler.edit_comment(edit_comment_id, comment_edit_box)
                 return redirect('view_post', post_id=post_id)
 
             elif 'delete_comment' in self.request.POST:
                 delete_comment_id = self.request.POST.get('comment_id')
-                comment_to_delete = Comment.objects.filter(id=delete_comment_id).first()
-                if comment_to_delete:
-                    comment_to_delete.delete()
+                self.comment_handler.delete_comment(delete_comment_id)
 
             elif 'open_edit_box' in self.request.POST:
                 comment_id = self.request.POST.get('comment_id')
                 comment_id = str(comment_id).strip()
                 edit_comment = Comment.objects.filter(id=comment_id).first()
 
-        all_comments = Comment.objects.filter(post_id=post_id)
-        user_comments = Comment.objects.filter(user_id=self.user_id) if self.user_id else None
+        all_comments = self.comment_handler.get_all_comments(post_id)
+        user_comments = self.comment_handler.get_user_comments_of_post(post_id)
 
-        total_post_comments = Comment.objects.filter(post_id=post_id).count()
-        total_post_likes = Like.objects.filter(post_id=post_id).count()
+        total_post_comments = self.comment_handler.get_post_total_comments(post)
+        total_post_likes = self.like_handler.get_post_total_likes(post)
         user_liked = False
 
         if self.user_id:
-            user_liked = Like.objects.filter(post_id=post_id, user_id=self.user_id).exists()
+            user_liked = self.like_handler.user_liked_post(post.id)
 
         context = {
             'post': post,
