@@ -13,41 +13,57 @@ from .admins import AdminViews
 import hashlib
 
 class UserViews(BaseView):
-    def __init__(self, request):
-        super().__init__(request)
-        self.comment_handler = CommentViews(self.user_id)
-        self.like_handler = LikeViews(self.user_id)
+    def dispatch(self, request, *args, **kwargs):
+        self.user_id = request.session.get('user_id', None)
 
-    def user_header(self):
+        response = super().dispatch(request, *args, **kwargs)
+
+        return response
+    
+    def initialize_handlers(self):
+        """Khởi tạo comment_handler và like_handler"""
+        self.comment_handler = CommentViews(user_id=self.user_id)
+        self.like_handler = LikeViews(user_id=self.user_id)
+
+class UserHeaderView(UserViews):
+    def get(self, request):
         """Load header đối với user"""
-        print(self.user_id)       
-        return render(self.request, 'user_header.html', self.context)
+        return render(request, 'user_header.html', self.context)
 
-    def load_contact(self):
+class UserContactView(UserViews):
+    def get(self, request):
         """Load trang Contact"""
-        return render(self.request, 'contact.html', self.context)
+        return render(request, 'contact.html', self.context)
 
-    def load_about(self):
+class UserAboutView(UserViews):
+    def get(self, request):
         """Load trang About"""
-        return render(self.request, 'about.html', self.context)
+        return render(request, 'about.html', self.context)
 
-    def user_logout(self):
+class UserLogoutView(UserViews):
+    def get(self, request):
         """Đăng xuất"""
-        logout(self.request)
+        logout(request)
         return redirect('home')
 
-    def login(self):
+class UserLoginView(UserViews):
+    def get(self, request):
+        if request.session.get('user_id'):
+            return redirect('home')  # Nếu đã đăng nhập, chuyển hướng đến dashboard
+        return render(request, 'login.html')
+     
+    def post(self, request):
         """Đăng nhập"""
         message = ''
-        if self.request.method == 'POST':
-            email = self.request.POST.get('email')
-            password = self.request.POST.get('pass')
+        if request.method == 'POST':
+            email = request.POST.get('email')
+            password = request.POST.get('pass')
     
             try:
                 user = User.objects.get(email=email)
                 hashed_password = hashlib.sha1(password.encode()).hexdigest()
                 if hashed_password == user.password:
-                    self.request.session['user_id'] = user.id
+                    request.session['user_id'] = user.id
                     print(self.user_id)
                     return redirect('home')
                 else:
@@ -55,17 +71,21 @@ class UserViews(BaseView):
             except User.DoesNotExist:
                 message = 'Incorrect username or password!'
 
-        return render(self.request, 'login.html', {'message': message if 'message' in locals() else ''})
-    
-    def register(self):
+        return render(request, 'login.html', {'message': message if 'message' in locals() else ''})
+
+class UserRegisterView(UserViews):  
+    def get(self, request):
+        return render(request, 'register.html')
+
+    def post(self, request):
         """Đăng ký"""
         message = ''
-        if self.request.method == 'POST':
+        if request.method == 'POST':
             name, email, password, confirm_password = (
-                self.request.POST.get('name'),
-                self.request.POST.get('email'),
-                self.request.POST.get('pass'),
-                self.request.POST.get('cpass'),
+                request.POST.get('name'),
+                request.POST.get('email'),
+                request.POST.get('pass'),
+                request.POST.get('cpass'),
             )
             
             if User.objects.filter(email=email).exists():
@@ -78,17 +98,21 @@ class UserViews(BaseView):
                     user = User(name=name, email=email, password=hashed_password)
                     user.save()
                     
-                    self.request.user_id = user.id
+                    request.user_id = user.id
                     return redirect('home')
 
-        return render(self.request, 'register.html', {'message': message if 'message' in locals() else ''})
-    
-    def update_profile(self):
+        return render(request, 'register.html', {'message': message if 'message' in locals() else ''})
+
+class UserUpdateProfileView(UserViews):
+    def get(self, request):
+        return render(request, 'update.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+
+    def post(self, request):
         """Chỉnh sửa thông tin cá nhân"""
         message = ''
-        if self.request.method == 'POST' and 'submit' in self.request.POST:
-            name = self.request.POST.get('name', '').strip()
-            email = self.request.POST.get('email', '').strip()
+        if request.method == 'POST' and 'submit' in request.POST:
+            name = request.POST.get('name', '').strip()
+            email = request.POST.get('email', '').strip()
 
             if name:
                 self.user.name = name
@@ -101,9 +125,9 @@ class UserViews(BaseView):
                     self.user.email = email
                     self.user.save()
 
-            old_pass = self.request.POST.get('old_pass', '')
-            new_pass = self.request.POST.get('new_pass', '')
-            confirm_pass = self.request.POST.get('confirm_pass', '')
+            old_pass = request.POST.get('old_pass', '')
+            new_pass = request.POST.get('new_pass', '')
+            confirm_pass = request.POST.get('confirm_pass', '')
 
             if old_pass:
                 if hashlib.sha1(old_pass.encode()).hexdigest() != self.user.password:
@@ -123,13 +147,15 @@ class UserViews(BaseView):
             'message': message,
             'user_id': self.user_id,
         }
-        return render(self.request, 'update.html', context)
-    
-    def user_likes(self):
+        return render(request, 'update.html', context)
+
+class UserLikesView(UserViews):    
+    def get(self, request):
         """Hiển thị tất cả các bài viết mà user đã Like"""
         post_data = []
 
         if self.user_id:
+            self.initialize_handlers()
             likes = self.like_handler.get_user_likes()
             if likes.exists():
                 post_ids = likes.values_list('post_id', flat=True)
@@ -149,9 +175,10 @@ class UserViews(BaseView):
             'user_id': self.user_id,
         }
 
-        return render(self.request, 'user_likes.html', context)
+        return render(request, 'user_likes.html', context)
 
-    def load_home(self):
+class UserHomeView(UserViews):
+    def get(self, request):
         """Load trang Home"""
         context = {
             'user_name': None,
@@ -161,6 +188,8 @@ class UserViews(BaseView):
             'authors': [],
             'user_id': self.user_id,
         }
+
+        self.initialize_handlers()
 
         if self.user_id:
             context['user_name'] = self.user_name
@@ -189,17 +218,22 @@ class UserViews(BaseView):
         context['posts'] = post_data
         context['authors'] = authors
         
-        return render(self.request, 'home.html', context)
+        return render(request, 'home.html', context)
 
-    def user_comments(self):
+class UserCommentsView(UserViews):
+    def get(self, request):
+        return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+
+    def post(self, request):
         """Hiển thị tất cả comment mà user đã comment"""
         comment_id = None
         edit_comment = None
         message = ''
-        if self.request.method == "POST":
-            if 'edit_comment' in self.request.POST:
-                edit_comment_id = self.request.POST.get('edit_comment_id')
-                comment_edit_box = self.request.POST.get('comment_edit_box')
+        self.initialize_handlers()
+        if request.method == "POST":
+            if 'edit_comment' in request.POST:
+                edit_comment_id = request.POST.get('edit_comment_id')
+                comment_edit_box = request.POST.get('comment_edit_box')
 
                 if self.comment_handler.comment_exists(comment_edit_box, edit_comment_id):
                     message = "Comment already added!"
@@ -207,13 +241,13 @@ class UserViews(BaseView):
                     self.comment_handler.update_comment(edit_comment_id, comment_edit_box)
                     message = "Your comment edited successfully!"
 
-            elif 'delete_comment' in self.request.POST:
-                delete_comment_id = self.request.POST.get('comment_id')
+            elif 'delete_comment' in request.POST:
+                delete_comment_id = request.POST.get('comment_id')
                 if self.comment_handler.delete_comment(delete_comment_id):
                     message = "Comment deleted successfully!"
 
-            elif 'open_edit_box' in self.request.POST:
-                comment_id = self.request.POST.get('comment_id')
+            elif 'open_edit_box' in request.POST:
+                comment_id = request.POST.get('comment_id')
                 edit_comment = self.comment_handler.get_current_comments(comment_id)
 
         comments = self.comment_handler.get_user_comments()
@@ -227,10 +261,12 @@ class UserViews(BaseView):
             'user_name': self.user_name,
         }
 
-        return render(self.request, 'user_comments.html', context)
-    
-    def like_post(self, post_id):
+        return render(request, 'user_comments.html', context)
+
+class UserLikedPost(UserViews):    
+    def get(self, request, post_id):
         """Like hoặc Unlike bài post"""
+        self.initialize_handlers()
         like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
         post = Post.objects.get(id=post_id)
         admin = Admin.objects.get(id=post.admin_id)
@@ -240,14 +276,15 @@ class UserViews(BaseView):
         else:
             self.like_handler.like_post(self.user, admin, post)
 
-        return redirect(self.request.META.get('HTTP_REFERER'))
+        return redirect(request.META.get('HTTP_REFERER'))
 
-
-    def load_author_posts(self, author):
+class UserLoadAuthorPosts(UserViews):
+    def get(self, request, author):
         """Hiển thị các bài post của tác giả tương ứng"""
         posts = Post.objects.filter(name=author, status='active')
 
         post_data = []
+        self.initialize_handlers()
         for post in posts:
             total_comments = self.comment_handler.get_post_total_comments(post)
             total_likes = self.like_handler.get_post_total_likes(post)
@@ -269,4 +306,32 @@ class UserViews(BaseView):
             'user_name': self.user_name,
         }  
 
-        return render(self.request, 'author_posts.html', context)
+        return render(request, 'author_posts.html', context)
+    
+
+class UserLoadAuthors(UserViews):
+    def get(self, request):
+        """Hiển thị các tác giả (là admin)"""
+        authors = Admin.objects.all()
+        author_stats = []
+        self.initialize_handlers()
+        for author in authors:
+            total_posts = Post.objects.filter(admin_id=author.id, status='active').count()
+
+            total_likes = Like.objects.filter(admin_id=author.id).count()
+            total_comments = Comment.objects.filter(admin_id=author.id).count()
+            
+            author_stats.append({
+                'name': author.name,
+                'total_posts': total_posts,
+                'total_likes': total_likes,
+                'total_comments': total_comments,
+            })
+
+        context = {
+            'author_stats': author_stats,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+        
+        return render(request, 'authors.html', context)

@@ -37,6 +37,7 @@
         </div>
         <div class="text">{{ item.comment.comment }}</div>
         <form action="" method="POST">
+            {% csrf_token %}
             <input type="hidden" name="comment_id" value="{{ item.comment.id }}">
             <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete comment</button>
         </form>

@@ -1,36 +1,37 @@
 from django.urls import path
-from .views import views
+from .views.admins import AdminLoginView, AdminDashboardView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView
+from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost
+from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
 
 urlpatterns = [
-    path('', views.load_home, name='home'),
-    path('user_header/', views.user_header, name='user_header'),
-    path('search/', views.search, name='search'),
-    path('posts/', views.load_posts, name='posts'),
-    path('authors/', views.load_authors, name='authors'),
+    path('', UserHomeView.as_view(), name='home'),
+    path('user_header/', UserHeaderView.as_view(), name='user_header'),
+    # path('search/', views.search, name='search'),
+    path('posts/', PostLoadAllPost.as_view(), name='posts'),
+    path('authors/', UserLoadAuthors.as_view(), name='authors'),
 
-    path('login/', views.login, name='login'),
-    path('logout/', views.user_logout, name='user_logout'),
-    path('register/', views.register, name='register'),
+    path('login/', UserLoginView.as_view(), name='login'),
+    path('logout/', UserLogoutView.as_view(), name='user_logout'),
+    path('register/', UserRegisterView.as_view(), name='register'),
 
+    path('all-category/', PostAllCategory.as_view(), name='all_category'),
+    path('category/<str:category_name>/', PostOfCategory.as_view(), name='category'),
+    path('contact/', UserContactView.as_view(), name='contact'),
+    path('about/', UserAboutView.as_view(), name='about'),
 
-    path('all-category/', views.load_all_category, name='all_category'),
-    path('category/<str:category_name>/', views.load_category, name='category'),
-    path('contact/', views.load_contact, name='contact'),
-    path('about/', views.load_about, name='about'),
-
-    path('admin-login/', views.admin_login, name='admin_login'),
-    path('admin-logout/', views.admin_logout, name='admin_logout'),
-    path('update-profile/<str:admin_name>/', views.admin_update_profile, name='admin_update_profile'),
-    path('view-post/', views.admin_view_post, name='admin_view_post'),
-    path('users-accounts', views.get_users_accounts, name='users_accounts'),
-    path('admin-accounts', views.get_admin_accounts, name='admin_accounts'),
-    path('comments', views.get_comments, name='comments'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('author/<str:author>/', views.load_author_posts, name='author_posts'),
-    path('update-profile', views.update_profile, name='update_profile'),
+    path('admin-login/', AdminLoginView.as_view(), name='admin_login'),
+    path('admin-logout/', AdminLogoutView.as_view(), name='admin_logout'),
+    path('update-profile/<str:admin_name>/', AdminUpdateProfileView.as_view(), name='admin_update_profile'),
+    path('view-post/', AdminViewPostView.as_view(), name='admin_view_post'),
+    path('users-accounts', AdminGetUsersView.as_view(), name='users_accounts'),
+    path('admin-accounts', AdminGetAdminsView.as_view(), name='admin_accounts'),
+    path('comments', AdminGetCommentsView.as_view(), name='comments'),
+    path('dashboard/', AdminDashboardView.as_view(), name='dashboard'),
+    path('author/<str:author>/', UserLoadAuthorPosts.as_view(), name='author_posts'),
+    path('update-profile', UserUpdateProfileView.as_view(), name='update_profile'),
     
-    path('user_likes', views.user_likes, name='user_likes'),
-    path('user_comments', views.user_comments, name='user_comments'),
-    path('post/<int:post_id>/', views.view_post, name='view_post'),
-    path('like-post/<int:post_id>', views.like_post, name='like_post'),
+    path('user-likes', UserLikesView.as_view(), name='user_likes'),
+    path('user-comments', UserCommentsView.as_view(), name='user_comments'),
+    path('post/<int:post_id>/', PostViewPost.as_view(), name='view_post'),
+    path('like-post/<int:post_id>', UserLikedPost.as_view(), name='like_post'),
 ]

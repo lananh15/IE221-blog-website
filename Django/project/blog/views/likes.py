@@ -2,8 +2,9 @@ from django.utils import timezone
 from ..models import Like, Comment
 
 class LikeViews:
-    def __init__(self, user_id):
+    def __init__(self, user_id=None, admin_id=None):
         self.user_id = user_id
+        self.admin_id = admin_id
 
     def get_post_total_likes(self, post):
         """Lấy số lượt thích của một bài viết"""

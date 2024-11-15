@@ -1,7 +1,8 @@
 from ..models import Admin, User
+from django.views import View
 
-class BaseView:
-    def __init__(self, request):
+class BaseView(View):
+    def dispatch(self, request, *args, **kwargs):
         self.request = request
         self.user_id = request.session.get('user_id', None)
         self.user = User.objects.filter(id=self.user_id).first() if self.user_id else None
@@ -19,3 +20,4 @@ class BaseView:
             'admin_id': self.admin_id,
             'admin_name': self.admin_name,
         }
+        return super().dispatch(request, *args, **kwargs)
