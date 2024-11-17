@@ -1,4 +1,4 @@
-## Vui lòng không chỉnh sửa hay đụng gì tới mấy cái code t sửa trong thư mục Django này rồi nha 😞. Chỉ được thêm code mới vào hoặc xem thôi
+## 📒 NOTE
 Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục Django/project/cert là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database á).  
 
 Tuyệt đối ko chỉnh sửa hay đụng tới thư mục models, static, cert, và các file như Django/project/blog/middleware.py, Django/project/blog/views/base.py
@@ -89,7 +89,7 @@ self.user_id
 # Hoặc gọi admin_id thì dùng self.admin_id
 ```
 
-## Lưu ý các file trong thư mục Django/project/blog/models
+## ⚠️ Lưu ý các file trong thư mục Django/project/blog/models
 Hiện tại database t đã tích hợp vào rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được.  
 Cấu trúc file của thư mục models:  
 ![Screenshot 2024-11-17 155144](https://github.com/user-attachments/assets/fdb1edba-8d3c-4b5e-98cc-f46a19154868)  
@@ -409,7 +409,7 @@ Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context đ
    </script>
 {% endif %}
 ```
-Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import user_header.html thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
+Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import *user_header.html* thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
 
 **Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
 ### 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
