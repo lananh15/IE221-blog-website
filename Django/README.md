@@ -422,7 +422,8 @@ Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context đ
 ```
 Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import *user_header.html* hoặc import *admin_header.html* thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
 
-#### Về vòng lặp for của DTL trong file .html, ví dụ 1 đoạn mã trong user_comments.html:
+#### Về vòng lặp for của DTL trong file .html
+Ví dụ 1 đoạn mã trong *user_comments.html*:
 ```html
 <div class="user-comments-container">
     {% if comments %}
