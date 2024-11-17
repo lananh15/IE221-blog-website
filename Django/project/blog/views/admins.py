@@ -40,9 +40,10 @@ class AdminViews(BaseView):
     
 
 class AdminLoginView(AdminViews):
+    """Hiển thị trang login phía admin"""
     def get(self, request):
         if request.session.get('admin_id'):
-            return redirect('dashboard')  # Nếu đã đăng nhập, chuyển hướng đến dashboard
+            return redirect('dashboard')
         return render(request, 'admin/admin_login.html')
 
     def post(self, request):
@@ -63,6 +64,7 @@ class AdminLoginView(AdminViews):
         return render(request, 'admin/admin_login.html', {'message': message})
 
 class AdminDashboardView(AdminViews, View):
+    """Hiển thị trang Dashboard phía admin"""
     def get(self, request):
         admin_name = self.get_admin_context()
         if admin_name is None:
@@ -91,11 +93,13 @@ class AdminDashboardView(AdminViews, View):
         return render(request, 'admin/dashboard.html', context)
 
 class AdminLogoutView(AdminViews):
+    """Xử lý logout cho admin"""
     def get(self, request):
         logout(request)
         return redirect('admin_login')
 
 class AdminUpdateProfileView(AdminViews):
+    """Xử lý trang update profile phía admin"""
     def get(self, request, admin_name):
         return render(request, 'admin/update_profile.html', {'admin_name': admin_name, 'admin_id': self.admin_id})
 
@@ -135,7 +139,8 @@ class AdminUpdateProfileView(AdminViews):
 
         return render(request, 'admin/update_profile.html', context)
 
-class AdminViewPostView(AdminViews):    
+class AdminViewPostView(AdminViews):
+    """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
     def get(self, request):
         if self.admin_id is None:
             return redirect('admin_login')
@@ -173,10 +178,15 @@ class AdminViewPostView(AdminViews):
             post.delete()
             Comment.objects.filter(post_id=p_id).delete()
             message = 'Post deleted successfully!'
-
-        return redirect('admin_view_post')
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'message': message,
+        }
+        return render(request, 'admin/view_post.html', context)
 
 class AdminGetUsersView(AdminViews):
+    """Lấy thông tin tất cả user đang có trên web"""
     def get(self, request):
         admin_name = self.get_admin_context()
         if admin_name is None:
@@ -202,6 +212,7 @@ class AdminGetUsersView(AdminViews):
         return render(request, 'admin/users_accounts.html', context)
 
 class AdminGetAdminsView(AdminViews):
+    """Lấy thông tin tất cả các admin hiện tại có trên web"""
     def get(self, request):
         admin_name = self.get_admin_context()
         if admin_name is None:
@@ -239,6 +250,7 @@ class AdminGetAdminsView(AdminViews):
         return render(request, 'admin/admin_accounts.html', context)
 
 class AdminGetCommentsView(AdminViews):
+    """Xem tất cả comment có liên quan đến admin hiện tại đã login"""
     def get(self, request):
         admin_name = self.get_admin_context()
         if admin_name is None:
