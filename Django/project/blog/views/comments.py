@@ -23,7 +23,7 @@ class CommentViews:
         return Comment.objects.filter(post_id=post_id)
     
     def get_post_total_comments(self, post):
-        """Lấy số lượt bình luận và số lượt thích của một bài viết"""
+        """Lấy số lượt bình luận của một bài viết"""
         total_comments = Comment.objects.filter(post_id=post.id).count()
         return total_comments
     

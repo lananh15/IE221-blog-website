@@ -1,7 +1,8 @@
 ## 📒 NOTE
-Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục Django/project/cert là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database á).  
+Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục **Django/project/cert** là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database á).  
 
-Tuyệt đối ko chỉnh sửa hay đụng tới thư mục models, static, cert, và các file như Django/project/blog/middleware.py, Django/project/blog/views/base.py
+Tuyệt đối ko chỉnh sửa hay đụng tới thư mục *models, static, cert*, và các file như *Django/project/blog/middleware.py, Django/project/blog/views/base.py*
+
 ### ⚠️ Chú ý
 Thư mục Django này là chỗ chính thức để tụi mình code đồ án (tức là chuyển mấy code php kia sang python thì sẽ làm trong thư mục này khi nào xong hết đồ án thì tụi mình xóa mấy file php bên ngoài thư mục Django này).  
 Nhưng mà hiện tại t mới fix bên phía người dùng thôi, còn admin thì chưa sửa hết.
@@ -21,6 +22,9 @@ python manage.py runserver
 
 ### ⚠️ Lưu ý sơ bộ
 Backend python làm thường gặp mấy lỗi kiểu gọi thuộc tính của instance gì đó từ database thì mn có thể đọc lỗi python nó báo rồi hỏi chatgpt nó fix được, khum thì tham khảo code của t cũng được.  
+
+Lúc code nếu mà máy của mọi người nó báo lỗi liên quan mấy cái module của Django giống giống dưới đây (mặc dù đã pip install django rồi) thì cứ kệ nha, runserver vẫn chạy được web á:  
+![Screenshot 2024-11-17 194606](https://github.com/user-attachments/assets/98db5c1d-b5f9-4ff5-861c-a66672a8b055)  
 
 Lưu ý nhỏ là thường trong lúc code python mà muốn lấy user hiện tại đang dùng web thì chỉ cho gọi theo kiểu:
 ```bash
@@ -93,7 +97,7 @@ self.user_id
 Hiện tại database t đã tích hợp vào rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được.  
 Cấu trúc file của thư mục models:  
 ![Screenshot 2024-11-17 155144](https://github.com/user-attachments/assets/fdb1edba-8d3c-4b5e-98cc-f46a19154868)  
-5 file admin, comments, likes, posts, users tương ứng là 5 table trong database của mình.
+5 file *admins.py, comments.py, likes.py, posts.py, users.py* tương ứng là 5 table trong database của mình.
 Trong quá trình làm thì ko sửa mấy file trong thư mục models giùm t vì trong đó là thiết lập các table của database, mọi người xem tên thuộc tính đồ thôi ha. Ví dụ như file **Django/project/blog/models/posts.py** sẽ chứa các thuộc tính của bảng post trong database và tên thuộc tính cũng giống với cái tên thuộc tính hiển thị trên phpMyAdmin luôn để dễ làm việc:
 ```python
 from django.db import models
@@ -290,6 +294,12 @@ Tương ứng với định dạng url trong file **Django/project/blog/urls.py*
 </html>
 ```
 
+## ⚠️ Lưu ý với các file comments.py và likes.py trong thư mục Django/project/blog/views
+Với các hàm xử lý logic lặp đi lặp lại nhiều lần (ví dụ như liên quan Comment là Lấy số lượt bình luận của một bài viết, hoặc liên quan Like là Lấy tất cả lượt like của người dùng đã like,...) thì sẽ tổ chức thành các lớp CommentViews và LikeViews tương ứng trong thư mục **Django/project/blog/views**, gom nhóm tất cả các hàm (method) liên quan, giúp code dễ bảo trì hơn và có thể tái sử dụng nhiều lần ở nhiều file code khác nhau mà không cần lặp lại logic code đó. 
+- *CommentViews* chỉ tập trung xử lý các công việc liên quan đến bình luận.
+- *LikeViews* chỉ tập trung xử lý các công việc liên quan đến lượt thích.
+Nên khi mn code có gì liên quan đến comment và like thì nên code vào class của 2 file comments.py và likes.py này nha để tiện gọi và quản lý code.
+
 ## ⚠️ Lưu ý với các file template_name.html
 ### Load các file tĩnh như css, js hoặc image (image tĩnh là image dạng không thay đổi được trên web sẽ khác với image các bài blog là thêm, xóa, sửa được)
 Với đoạn mã HTML ở trên (user_comments.html) thì mọi người sẽ thấy ngay dòng đầu tiên là:
@@ -376,7 +386,7 @@ class PostViewPost(PostsViews):
 
 ### Django Template Language (DTL)
 Có thể đọc ở https://viblo.asia/p/django-template-language-6J3ZgyRP5mB (quan trọng là mục Tags) để hiểu thêm.  
-GỌI BIẾN TRONG CONTEXT RA SỬ DỤNG:  
+#### Gọi biến trong context ra sử dụng:  
 Như đã nói trong urls.py:
 ```python
 path('user-comments', UserCommentsView.as_view(), name='user_comments'),
@@ -411,5 +421,52 @@ Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context đ
 ```
 Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import *user_header.html* thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
 
+#### Về vòng lặp for của DTL trong file .html, ví dụ 1 đoạn mã trong user_comments.html:
+```html
+<div class="user-comments-container">
+    {% if comments %}
+        {% for comment in comments %}
+        <div class="show-comments">
+            <div class="post-title">From: 
+              <span>{{ comment.post_id.title }}</span> 
+              <a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+            </div>
+            <div class="comment-box">{{ comment.comment }}</div>
+            <form action="" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="comment_id" value="{{ comment.id }}">
+              <button type="submit" class="inline-option-btn" name="open_edit_box">Edit Comment</button>
+              <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete Comment</button>
+           </form>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="empty">No comments added yet!</p>
+    {% endif %}
+</div>
+```
+Và comments trong context của file **Django/project/blog/views/users.py**:
+```python
+comments = self.comment_handler.get_user_comments()
+
+context = {
+    'comments': comments,
+    'edit_comment': edit_comment,
+    'comment_id': comment_id,
+    'message': message,
+    'user_id': self.user_id,
+    'user_name': self.user_name,
+}
+
+return render(request, 'user_comments.html', context)
+```
+Và hàm *get_all_comments* trong file **Django/project/blog/views/comments.py**:
+```python
+def get_user_comments(self):
+    """Lấy tất cả các bình luận của người dùng đã bình luận"""
+    return Comment.objects.filter(user_id=self.user_id)
+```
+- comments này là 1 list các comments mà người dùng hiện tại đã bình luận. 1 comment sẽ chứa các thuộc tính là *id, post_id, admin_id, user_id, user_name, comment, date* nên trong html, *{% for comment in comments %}* là duyệt qua từng comment trong list comments này, lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu *{{ comment.comment }}* (Nếu vòng lặp for ghi là *{% for item in comments %}* thì lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu *{{ item.comment }}*)
+- Trong vòng lặp for *{% for comment in comments %}*, có chứa *{{ comment.post_id.title }}* lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi *{{ comment.post_id.title }}*. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^
 **Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
-### 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
+## 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
