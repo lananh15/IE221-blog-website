@@ -122,7 +122,7 @@ class Post(models.Model):
 ## ⚠️ Lưu ý để code MVC (thực chất với Django là MVT), tổ chức OOP
 Trong **Django/project/blog/views** có cấu trúc như hình dưới đây:  
 ![Screenshot 2024-11-16 143317](https://github.com/user-attachments/assets/babbf8a8-35f4-4f47-b722-cbb8bcfeb859)  
-Nhìn tên file là biết rồi ha, tương ứng với mỗi file thì nội dung bên trong file sẽ là các code chứa logic liên quan đến tên file. Ví dụ trong users.py sẽ có code logic để hiển thị trang login, register phía user...
+Nhìn tên file là biết rồi ha, tương ứng với mỗi file thì nội dung bên trong file sẽ là các code chứa logic liên quan đến tên file. Ví dụ trong users.py sẽ có code logic để hiển thị trang login, register, load trang home... phía user.
 
 Để thuận tiện cho việc MVT, tổ chức code theo OOP để dễ quản lý thì Django có hỗ trợ **class-based view** mọi người có thể tìm đọc thêm, ở đây nói sơ sơ thôi nha.
 
