@@ -288,6 +288,9 @@ Import header và footer cho trang web chỉ với 2 dòng dưới đây:
 ```html
 <!-- Ghi ở dòng đầu tiên của thẻ <body> ghi như này là import được header -->
 {% include 'user_header.html' %}
+<!-- Nếu muốn lấy header của trang admin thì cũng ghi ở dòng đầu tiên của thẻ <body> bên các trang của admin -->
+{% include 'admin/admin_header.html' %}
+
 <!-- Ghi ở dòng cuối cùng của thẻ <body> ghi như dưới là import được footer -->
 {% include 'footer.html' %}
 ```
@@ -317,7 +320,7 @@ Format của path: *path(route, view, kwargs=None, name=None)*, trong đó:
 Dòng **{% url 'user_comments' %}** format là *{% url 'name_of_path_tương_ứng' %}*  
 Dòng **{% url 'view_post' comment.post_id.id %}** format là *{% url 'name_of_path_tương_ứng' biến_truyền_thêm_vào %}*  
 
-Khi nào cần truyền thêm biến vào url? Ví dụ như view_post sẽ truyền thêm biến id của bài post vì khi người dùng click vào Read More của bài viết bất kì, sẽ phải lấy id của bài viết đó truyền cho url và hàm views tương ứng để xử lý hiển thị cho nó, như code dưới đây (tùy trường hợp code mà sẽ cần truyền biến, không thì thôi):
+Khi nào cần truyền thêm biến vào url? Ví dụ như view_post sẽ truyền thêm biến id của bài post vì khi người dùng click vào Read More của bài viết bất kì, sẽ phải lấy id của bài viết đó truyền cho url và hàm views tương ứng để xử lý hiển thị cho nó, như code dưới đây nhận thêm biến post_id để xử lý hiển thị đúng bài post (tùy trường hợp code mà sẽ cần truyền biến, không thì thôi):
 ```python
 # đoạn code trong file Django/project/blog/views/posts.py
 class PostViewPost(PostsViews):
@@ -347,7 +350,7 @@ class PostViewPost(PostsViews):
 ```
 
 ### Django Template Language (DTL)
-Có thể đọc ở https://viblo.asia/p/django-template-language-6J3ZgyRP5mB (quan trọng là mục Tags) để hiểu thêm.
+Có thể đọc ở https://viblo.asia/p/django-template-language-6J3ZgyRP5mB (quan trọng là mục Tags) để hiểu thêm.  
 GỌI BIẾN TRONG CONTEXT RA SỬ DỤNG:  
 Như đã nói trong urls.py:
 ```python
@@ -368,7 +371,7 @@ context = {
 
 return render(request, 'user_comments.html', context)
 ```
-Giả sử trong user_comments.html khi render ra mà muốn lấy giá trị message trong context thì chỉ cần ghi:
+Giả sử trong *user_comments.html* khi render ra mà muốn lấy giá trị message trong context thì chỉ cần ghi:
 ```html
 {{ message }}
 ```
