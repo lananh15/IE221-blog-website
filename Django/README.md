@@ -1,5 +1,5 @@
 ## Vui lòng không chỉnh sửa hay đụng gì tới mấy cái code t sửa trong thư mục Django này rồi nha 😞. Chỉ được thêm code mới vào hoặc xem thôi
-
+Tuyệt đối ko chỉnh sửa hay đụng tới thư mục models, static, cert, và các file như Django/project/blog/middleware.py, Django/project/blog/views/base.py
 ### ⚠️ Chú ý
 Thư mục Django này là chỗ chính thức để tụi mình code đồ án (tức là chuyển mấy code php kia sang python thì sẽ làm trong thư mục này khi nào xong hết đồ án thì tụi mình xóa mấy file php bên ngoài thư mục Django này).  
 Nhưng mà hiện tại t mới fix bên phía người dùng thôi, còn admin thì chưa sửa hết.
@@ -17,7 +17,7 @@ Chạy xong thấy đuôi như này là oke:
 python manage.py runserver
 ```
 
-### Lưu ý sơ bộ
+### ⚠️ Lưu ý sơ bộ
 Hiện tại database t cũng tích hợp vào luôn rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được. Trong quá trình làm thì ko sửa mấy file trong thư mục models giùm t nha. Backend python làm thường gặp mấy lỗi kiểu gọi thuộc tính của instance gì đó từ database thì mn có thể đọc lỗi python nó báo rồi hỏi chatgpt nó fix được, khum thì tham khảo code của t cũng được.  
 
 Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục Django/project/cert là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database với python á).  
@@ -89,7 +89,7 @@ self.user_id
 # Hoặc gọi admin_id thì dùng self.admin_id
 ```
 
-## Lưu ý để code MVC (thực chất với Django là MVT), tổ chức OOP
+## ⚠️ Lưu ý để code MVC (thực chất với Django là MVT), tổ chức OOP
 Trong **Django/project/blog/views** có cấu trúc như hình dưới đây:  
 ![Screenshot 2024-11-16 143317](https://github.com/user-attachments/assets/babbf8a8-35f4-4f47-b722-cbb8bcfeb859)  
 Nhìn tên file là biết rồi ha, tương ứng với mỗi file thì nội dung bên trong file sẽ là các code chứa logic liên quan đến tên file. Ví dụ trong users.py sẽ có code logic để hiển thị trang login, register phía user...
@@ -106,9 +106,10 @@ urlpatterns = [
     path('user-comments', UserCommentsView.as_view(), name='user_comments'),
 ]
 ```
-UserCommentsView.as_view() có format [tên lớp].as_view() là do class base view của Django hỗ trợ, tức là cứ ghi theo format này thì nó sẽ tự chạy logic các hàm tương ứng bên trong lớp UserCommentsView, còn nó sẽ chạy hàm thế nào thì đọc tiếp ở dưới he.
+**UserCommentsView.as_view()** có format *[tên lớp].as_view()* là do class base view của Django hỗ trợ, tức là cứ ghi theo format này thì nó sẽ tự chạy logic các hàm tương ứng bên trong lớp UserCommentsView, còn nó sẽ chạy hàm thế nào thì đọc tiếp ở dưới he.  
 Trong **Django/project/blog/views/users.py** sẽ có 1 lớp chính là *UserViews* để các lớp liên quan user kế thừa:
 ```python
+# đoạn code thuộc file Django/project/blog/views/users.py
 class UserViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.session.get('user_id', None)
@@ -124,6 +125,7 @@ class UserViews(BaseView):
 ```
 Lấy ví dụ lớp *UserCommentsView* (logic Hiển thị tất cả comment mà user đã comment) sẽ kế thừa lớp *UserViews* trên và bao gồm 2 hàm bên trong là **get** và **post** tương ứng là 2 phương thức GET và POST đã học trong mạng máy tính:
 ```python
+# đoạn code thuộc file Django/project/blog/views/users.py
 class UserCommentsView(UserViews):
     """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
@@ -170,12 +172,16 @@ Tức là khi người dùng truy cập vào url chứa /user-comments là GET �
 
 Trong hàm get của t có return ra như dưới đây:
 ```python
+# đoạn code thuộc file Django/project/blog/views/users.py
+
 # format render của Django là render(request, 'template_name.html', context)
 # trong đó {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email} chính là context
 return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
 ```
 Hoặc trong hàm post của t có return ra như dưới đây:
 ```python
+# đoạn code thuộc file Django/project/blog/views/users.py
+
 context = {
     'comments': comments,
     'edit_comment': edit_comment,
@@ -191,8 +197,10 @@ Cấu trúc của context là một dictionary với các cặp key-value, trong
 - Key: Tên của biến mà bạn muốn sử dụng trong template.
 - Value: Giá trị của biến (có thể là chuỗi, số, danh sách, đối tượng, hoặc bất kỳ loại dữ liệu Python nào).  
 
-Tương ứng với định dạng url trong file **Django/project/blog/urls.py** (t đã ví dụ ở trên) thì khi user truy cập url chứa /user-comments nó sẽ hiển thị user-comments.html dưới đây (do hàm get trong lớp *UserCommentsView* return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email}) là render ra *user_comments.html*):
+Tương ứng với định dạng url trong file **Django/project/blog/urls.py** (t đã ví dụ ở trên) thì khi user truy cập url chứa /user-comments nó sẽ hiển thị user-comments.html dưới đây (do hàm get trong lớp *UserCommentsView* render ra *user_comments.html*):
 ```html
+<!-- đoạn template thuộc file Django/project/blog/template/user_comments.html -->
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -257,4 +265,123 @@ Tương ứng với định dạng url trong file **Django/project/blog/urls.py*
 </html>
 ```
 
-### 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa. Chỉ code thêm, và đặc biệt là không xóa sửa gì các file **Django/project/blog/middleware.py**, **Django/project/blog/views/base.py**
+## ⚠️ Lưu ý với các file template_name.html
+### Load các file tĩnh như css, js hoặc image (image tĩnh là image dạng không thay đổi được trên web sẽ khác với image các bài blog là thêm, xóa, sửa được)
+Với đoạn mã HTML ở trên (user_comments.html) thì mọi người sẽ thấy ngay dòng đầu tiên là:
+```html
+{% load static %}
+```
+Tại sao ghi như vậy là vì các file .js và .css nó nằm trong thư mục **Django/project/blog/static** (tức là các file tĩnh sẽ nằm trong static này á), khi muốn load được css hoặc js trong .html thì phải ghi thêm dòng đó vào rồi load .css và .js bằng cách:
+```html
+<head>
+    <!-- thẻ head còn nhiều dòng nhưng lấy dòng vidu cho static này thôi -->
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<!-- load js -->
+<script src="{% static 'js/script.js' %}"></script>
+```
+
+### Load header và footer cho trang web
+Import header và footer cho trang web chỉ với 2 dòng dưới đây:
+```html
+<!-- Ghi ở dòng đầu tiên của thẻ <body> ghi như này là import được header -->
+{% include 'user_header.html' %}
+<!-- Ghi ở dòng cuối cùng của thẻ <body> ghi như dưới là import được footer -->
+{% include 'footer.html' %}
+```
+
+### Load các url cần thiết cho href của thẻ <a> hoặc các button nhấn vào để chuyển hướng đến trang khác
+Trong *user_comments.html* có chứa các dòng url sau (lấy ví dụ):
+```html
+<div class="inline-option-btn" onclick="window.location.href = '{% url 'user_comments' %}';">Cancel Edit</div>
+
+<a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+```
+Tương ứng có các url pattern đã cài trong **Django/project/blog/urls.py**:
+```python
+urlpatterns = [
+    # còn nhiều path nữa, lấy ví dụ cái này thôi
+    path('user-comments', UserCommentsView.as_view(), name='user_comments'),
+
+    path('post/<int:post_id>/', PostViewPost.as_view(), name='view_post'),
+]
+```
+Format của path: *path(route, view, kwargs=None, name=None)*, trong đó:
+- route: Chuỗi định nghĩa URL mà bạn muốn ánh xạ (ví dụ: 'post/<int:post_id>/').
+- view: View xử lý khi người dùng truy cập URL này (có thể là class-based view).
+- kwargs (tùy chọn): Dictionary các tham số bổ sung bạn muốn truyền đến view.
+- name: Tên của route, cho phép bạn tham chiếu URL này ở các nơi khác (như trong file template_name.html) bằng tên thay vì viết lại toàn bộ đường dẫn.  
+
+Dòng **{% url 'user_comments' %}** format là *{% url 'name_of_path_tương_ứng' %}*  
+Dòng **{% url 'view_post' comment.post_id.id %}** format là *{% url 'name_of_path_tương_ứng' biến_truyền_thêm_vào %}*  
+
+Khi nào cần truyền thêm biến vào url? Ví dụ như view_post sẽ truyền thêm biến id của bài post vì khi người dùng click vào Read More của bài viết bất kì, sẽ phải lấy id của bài viết đó truyền cho url và hàm views tương ứng để xử lý hiển thị cho nó, như code dưới đây (tùy trường hợp code mà sẽ cần truyền biến, không thì thôi):
+```python
+# đoạn code trong file Django/project/blog/views/posts.py
+class PostViewPost(PostsViews):
+    def get(self, request, post_id):
+        post = Post.objects.get(id=post_id, status='active')
+        all_comments = self.comment_handler.get_all_comments(post_id)
+        user_comments = self.comment_handler.get_user_comments_of_post(post_id)
+
+        total_post_comments = self.comment_handler.get_post_total_comments(post)
+        total_post_likes = self.like_handler.get_post_total_likes(post)
+        user_liked = False
+
+        if self.user_id:
+            user_liked = self.like_handler.user_liked_post(post.id)
+
+        context = {
+            'post': post,
+            'all_comments': all_comments,
+            'user_name': self.user_name,
+            'user_id': self.user_id,
+            'user_comments': user_comments,
+            'total_post_comments': total_post_comments,
+            'total_post_likes': total_post_likes,
+            'user_liked': user_liked,
+        }
+        return render(request, 'view_post.html', context)
+```
+
+### Django Template Language (DTL)
+Có thể đọc ở https://viblo.asia/p/django-template-language-6J3ZgyRP5mB (quan trọng là mục Tags) để hiểu thêm.
+GỌI BIẾN TRONG CONTEXT RA SỬ DỤNG:  
+Như đã nói trong urls.py:
+```python
+path('user-comments', UserCommentsView.as_view(), name='user_comments'),
+``` 
+Và ví dụ context của lớp UserCommentsView trong **Django/project/blog/views/users.py**:
+```python
+# đoạn code thuộc file Django/project/blog/views/users.py
+
+context = {
+    'comments': comments,
+    'edit_comment': edit_comment,
+    'comment_id': comment_id,
+    'message': message,
+    'user_id': self.user_id,
+    'user_name': self.user_name,
+}
+
+return render(request, 'user_comments.html', context)
+```
+Giả sử trong user_comments.html khi render ra mà muốn lấy giá trị message trong context thì chỉ cần ghi:
+```html
+{{ message }}
+```
+Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context để in ra trên *user_comments.html*. Trong trường hợp này thì *message* là những thông báo alert của javascript, và t cài script này ở file chung là user_header.html (do trang nào cũng có header nên cài chung thông báo alert nhận message cho tiện, giống như header được import vào file *user_comments.html* nên khi render ra *user_comments.html* thì header cũng sẽ nhận được biến message này):
+```html
+<!-- đoạn mã trong file Django/project/blog/template/user_header.html -->
+{% if message %}
+   <script>
+      alert("{{ message }}");
+   </script>
+{% endif %}
+```
+Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import user_header.html thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
+
+**Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
+### 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
