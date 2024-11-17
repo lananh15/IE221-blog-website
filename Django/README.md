@@ -87,10 +87,11 @@ class BaseView(View):
 
 Nên là khi mọi người copy dính dòng code gọi này của t khi hỏi chatgpt thì nó sẽ kêu lỗi chỗ **self.user_id** nhưng thật ra là ko có lỗi đâu vì đã được code sẵn bên **Django/project/blog/middleware.py** để gọi rồi.  
 
-Tuy nhiên, base.py này chứa class mấy class khác trong thư mục **Django/project/blog/views** kế thừa (do nó chứa thông tin của user hiện tại duyệt web và bất kì trang nào cũng liên quan đến user nên cần lấy id, name của user để hiện lên header...) => Nhờ cái này mà mấy class kế thừa sau nếu muốn lấy id của user thì chỉ cần gọi:
+Tuy nhiên, base.py này chứa class mấy class khác trong thư mục **Django/project/blog/views** kế thừa (do nó chứa thông tin của user hiện tại duyệt web hoặc thông tin của admin hiện tại và bất kì trang nào ở phía user cũng liên quan đến user nên cần lấy id, name của user để hiện lên header... tương tự như các trang bên phía admin thì cũng cần các thông tin của admin hiện tại) => Nhờ cái này mà mấy class kế thừa sau nếu muốn lấy id của user thì chỉ cần gọi:
 ```bash
 self.user_id
 # Hoặc gọi admin_id thì dùng self.admin_id
+# Tương tự, gọi được self.user, self.user_name, self.user_email, self.admin, self.admin_name
 ```
 
 ## ⚠️ Lưu ý các file trong thư mục Django/project/blog/models
@@ -296,8 +297,8 @@ Tương ứng với định dạng url trong file **Django/project/blog/urls.py*
 
 ## ⚠️ Lưu ý với các file comments.py và likes.py trong thư mục Django/project/blog/views
 Với các hàm xử lý logic lặp đi lặp lại nhiều lần (ví dụ như liên quan Comment là Lấy số lượt bình luận của một bài viết, hoặc liên quan Like là Lấy tất cả lượt like của người dùng đã like,...) thì sẽ tổ chức thành các lớp CommentViews và LikeViews tương ứng trong thư mục **Django/project/blog/views**, gom nhóm tất cả các hàm (method) liên quan, giúp code dễ bảo trì hơn và có thể tái sử dụng nhiều lần ở nhiều file code khác nhau mà không cần lặp lại logic code đó. 
-- *CommentViews* chỉ tập trung xử lý các công việc liên quan đến bình luận.
-- *LikeViews* chỉ tập trung xử lý các công việc liên quan đến lượt thích.
+- Lớp **CommentViews** trong file *comments.py* chỉ tập trung xử lý các công việc liên quan đến bình luận.
+- Lớp **LikeViews** trong file *likes.py* chỉ tập trung xử lý các công việc liên quan đến lượt thích.
 Nên khi mn code có gì liên quan đến comment và like thì nên code vào class của 2 file comments.py và likes.py này nha để tiện gọi và quản lý code.
 
 ## ⚠️ Lưu ý với các file template_name.html
@@ -410,7 +411,7 @@ Giả sử trong *user_comments.html* khi render ra mà muốn lấy giá trị 
 ```html
 {{ message }}
 ```
-Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context để in ra trên *user_comments.html*. Trong trường hợp này thì *message* là những thông báo alert của javascript, và t cài script này ở file chung là user_header.html (do trang nào cũng có header nên cài chung thông báo alert nhận message cho tiện, giống như header được import vào file *user_comments.html* nên khi render ra *user_comments.html* thì header cũng sẽ nhận được biến message này):
+Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context để in ra trên *user_comments.html*. Trong trường hợp này thì *message* là những thông báo alert của javascript, và t cài script này ở file header chung là *user_header.html* và *admin_header.html* (do phía user thì trang nào cũng có header nên cài chung thông báo alert nhận message cho tiện, giống như header được import vào file *user_comments.html* nên khi render ra *user_comments.html* thì header cũng sẽ nhận được biến message này, tương tự như admin thì trang nào cũng có admin_header ha):
 ```html
 <!-- đoạn mã trong file Django/project/blog/template/user_header.html -->
 {% if message %}
@@ -419,7 +420,7 @@ Là khi render ra *user_comments.html* nó sẽ lấy *message* trong context đ
    </script>
 {% endif %}
 ```
-Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import *user_header.html* thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
+Nên là nếu mọi người muốn alert thông báo message trên trang (A) mà trang (A) có import *user_header.html* hoặc import *admin_header.html* thì chỉ cần thêm message vào context của views xử lý render của trang (A) là được.  
 
 #### Về vòng lặp for của DTL trong file .html, ví dụ 1 đoạn mã trong user_comments.html:
 ```html
@@ -466,7 +467,7 @@ def get_user_comments(self):
     """Lấy tất cả các bình luận của người dùng đã bình luận"""
     return Comment.objects.filter(user_id=self.user_id)
 ```
-- comments này là 1 list các comments mà người dùng hiện tại đã bình luận. 1 comment sẽ chứa các thuộc tính là *id, post_id, admin_id, user_id, user_name, comment, date* nên trong html, *{% for comment in comments %}* là duyệt qua từng comment trong list comments này, lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu *{{ comment.comment }}* (Nếu vòng lặp for ghi là *{% for item in comments %}* thì lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu *{{ item.comment }}*)
-- Trong vòng lặp for *{% for comment in comments %}*, có chứa *{{ comment.post_id.title }}* lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi *{{ comment.post_id.title }}*. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^
+- comments này là 1 list các comments mà người dùng hiện tại đã bình luận. 1 comment sẽ chứa các thuộc tính là *id, post_id, admin_id, user_id, user_name, comment, date* nên trong html, **{% for comment in comments %}** là duyệt qua từng comment trong list comments này, lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ comment.comment }}** (Nếu vòng lặp for ghi là **{% for item in comments %}** thì lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ item.comment }}**)
+- Trong vòng lặp for **{% for comment in comments %}**, có chứa **{{ comment.post_id.title }}** lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi **{{ comment.post_id.title }}**. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^
 **Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
 ## 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
