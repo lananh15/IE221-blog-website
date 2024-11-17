@@ -1,4 +1,6 @@
 ## Vui lòng không chỉnh sửa hay đụng gì tới mấy cái code t sửa trong thư mục Django này rồi nha 😞. Chỉ được thêm code mới vào hoặc xem thôi
+Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục Django/project/cert là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database á).  
+
 Tuyệt đối ko chỉnh sửa hay đụng tới thư mục models, static, cert, và các file như Django/project/blog/middleware.py, Django/project/blog/views/base.py
 ### ⚠️ Chú ý
 Thư mục Django này là chỗ chính thức để tụi mình code đồ án (tức là chuyển mấy code php kia sang python thì sẽ làm trong thư mục này khi nào xong hết đồ án thì tụi mình xóa mấy file php bên ngoài thư mục Django này).  
@@ -18,11 +20,9 @@ python manage.py runserver
 ```
 
 ### ⚠️ Lưu ý sơ bộ
-Hiện tại database t cũng tích hợp vào luôn rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được. Trong quá trình làm thì ko sửa mấy file trong thư mục models giùm t nha. Backend python làm thường gặp mấy lỗi kiểu gọi thuộc tính của instance gì đó từ database thì mn có thể đọc lỗi python nó báo rồi hỏi chatgpt nó fix được, khum thì tham khảo code của t cũng được.  
+Backend python làm thường gặp mấy lỗi kiểu gọi thuộc tính của instance gì đó từ database thì mn có thể đọc lỗi python nó báo rồi hỏi chatgpt nó fix được, khum thì tham khảo code của t cũng được.  
 
-Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, project*; trong đó thư mục **Django/project/project** là chạy lệnh **django-admin startproject project** mà có (project là tên dự án), thư mục **Django/project/blog** là chạy lệnh **python manage.py startapp blog** mà có (blog là tên app của mình), còn thư mục Django/project/cert là chỗ chứa chứng chỉ SSL của bên hosting database của mình thôi nên ko cần quan tâm và cũng đừng đụng tới (xóa hay gì là mất kết nối database với python á).  
-
-Lưu ý nhỏ nữa là thường trong lúc code python mà muốn lấy user hiện tại đang dùng web thì chỉ cho gọi theo kiểu:
+Lưu ý nhỏ là thường trong lúc code python mà muốn lấy user hiện tại đang dùng web thì chỉ cho gọi theo kiểu:
 ```bash
 user = request.user
 ```
@@ -89,12 +89,37 @@ self.user_id
 # Hoặc gọi admin_id thì dùng self.admin_id
 ```
 
+## Lưu ý các file trong thư mục Django/project/blog/models
+Hiện tại database t đã tích hợp vào rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được.  
+Cấu trúc file của thư mục models:  
+![Screenshot 2024-11-17 155144](https://github.com/user-attachments/assets/fdb1edba-8d3c-4b5e-98cc-f46a19154868)  
+5 file admin, comments, likes, posts, users tương ứng là 5 table trong database của mình.
+Trong quá trình làm thì ko sửa mấy file trong thư mục models giùm t vì trong đó là thiết lập các table của database, mọi người xem tên thuộc tính đồ thôi ha. Ví dụ như file **Django/project/blog/models/posts.py** sẽ chứa các thuộc tính của bảng post trong database và tên thuộc tính cũng giống với cái tên thuộc tính hiển thị trên phpMyAdmin luôn để dễ làm việc:
+```python
+from django.db import models
+from .admin import Admin
+
+class Post(models.Model):
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE)  # Foreign key relationship
+    name = models.CharField(max_length=100)  # Corresponds to the 'name' field in your database
+    title = models.CharField(max_length=100)  # Corresponds to the 'title' field
+    content = models.TextField()  # Use TextField for larger text content
+    category = models.CharField(max_length=50)  # Corresponds to the 'category' field
+    image = models.ImageField(upload_to='', null=True, blank=True)  # Assuming images are stored in 'uploaded_img/'
+    date = models.DateTimeField(auto_now_add=True)  # Automatically set on creation
+    status = models.CharField(max_length=10)  # Corresponds to the 'status' field
+
+    class Meta:
+        db_table = 'posts'  # This should match your database table name
+        managed = False
+```
+
 ## ⚠️ Lưu ý để code MVC (thực chất với Django là MVT), tổ chức OOP
 Trong **Django/project/blog/views** có cấu trúc như hình dưới đây:  
 ![Screenshot 2024-11-16 143317](https://github.com/user-attachments/assets/babbf8a8-35f4-4f47-b722-cbb8bcfeb859)  
 Nhìn tên file là biết rồi ha, tương ứng với mỗi file thì nội dung bên trong file sẽ là các code chứa logic liên quan đến tên file. Ví dụ trong users.py sẽ có code logic để hiển thị trang login, register phía user...
 
-Để thuận tiện cho việc MVT, tổ chức code theo OOP để dễ quản lý thì Django có hỗ trợ **class base view** mọi người có thể tìm đọc thêm, ở đây nói sơ sơ thôi nha.
+Để thuận tiện cho việc MVT, tổ chức code theo OOP để dễ quản lý thì Django có hỗ trợ **class-based view** mọi người có thể tìm đọc thêm, ở đây nói sơ sơ thôi nha.
 
 Trong **Django/project/blog/urls.py** sẽ chứa các pattern url để định dạng cái url mà mình mong muốn nó chạy logic gì giống thầy nói trên lớp (t lấy ví dụ phía user xem tất cả comment mà họ đã comment nha):
 ```python
@@ -106,7 +131,7 @@ urlpatterns = [
     path('user-comments', UserCommentsView.as_view(), name='user_comments'),
 ]
 ```
-**UserCommentsView.as_view()** có format *[tên lớp].as_view()* là do class base view của Django hỗ trợ, tức là cứ ghi theo format này thì nó sẽ tự chạy logic các hàm tương ứng bên trong lớp UserCommentsView, còn nó sẽ chạy hàm thế nào thì đọc tiếp ở dưới he.  
+**UserCommentsView.as_view()** có format *[tên lớp].as_view()* là do class-based view của Django hỗ trợ, tức là cứ ghi theo format này thì nó sẽ tự chạy logic các hàm tương ứng bên trong lớp UserCommentsView, còn nó sẽ chạy hàm thế nào thì đọc tiếp ở dưới he.  
 Trong **Django/project/blog/views/users.py** sẽ có 1 lớp chính là *UserViews* để các lớp liên quan user kế thừa:
 ```python
 # đoạn code thuộc file Django/project/blog/views/users.py
@@ -168,7 +193,7 @@ class UserCommentsView(UserViews):
 
         return render(request, 'user_comments.html', context)
 ```
-Tức là khi người dùng truy cập vào url chứa /user-comments là GET á thì nó sẽ chạy hàm get của lớp UserCommentsView; nếu người dùng nhấn button gì đó của form như là nhấn Delete comment tức là phương thức POST thì nó sẽ chạy hàm post của lớp UserCommentsView. (trong class base view này chỉ chạy 2 phương thức là GET và POST thôi, và đó là lý do tại sao các class trong users.py của t chỉ có 1 hoặc cả 2 hàm get và post tùy theo trang đó có form để dùng POST hay không nếu chỉ là trang hiển thị bình thường không có có form xóa sửa gì thì chỉ cần hàm get là đủ).  
+Tức là khi người dùng truy cập vào url chứa /user-comments là GET á thì nó sẽ chạy hàm get của lớp UserCommentsView; nếu người dùng nhấn button gì đó của form như là nhấn Delete comment tức là phương thức POST thì nó sẽ chạy hàm post của lớp UserCommentsView. (trong class-based view này chỉ chạy 2 phương thức là GET và POST thôi, và đó là lý do tại sao các class trong users.py của t chỉ có 1 hoặc cả 2 hàm get và post tùy theo trang đó có form để dùng POST hay không nếu chỉ là trang hiển thị bình thường không có có form xóa sửa gì thì chỉ cần hàm get là đủ).  
 
 Trong hàm get của t có return ra như dưới đây:
 ```python
