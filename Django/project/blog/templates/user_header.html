@@ -9,7 +9,7 @@
 
       <a href="{% url 'home' %}" class="logo">PyBlog</a>
 
-      <form action="{% url 'search' %}" method="POST" class="search-form">
+      <form action="/" method="POST" class="search-form">
          {% csrf_token %}
          <input type="text" name="search_box" class="box" maxlength="100" placeholder="Search..." required>
          <button type="submit" class="fas fa-search" name="search_btn"></button>

@@ -15,9 +15,8 @@ import hashlib
 class UserViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.session.get('user_id', None)
-
+        self.initialize_handlers()
         response = super().dispatch(request, *args, **kwargs)
-
         return response
     
     def initialize_handlers(self):
@@ -26,34 +25,34 @@ class UserViews(BaseView):
         self.like_handler = LikeViews(user_id=self.user_id)
 
 class UserHeaderView(UserViews):
+    """Load header đối với user"""
     def get(self, request):
-        """Load header đối với user"""
         return render(request, 'user_header.html', self.context)
 
 class UserContactView(UserViews):
+    """Load trang Contact"""
     def get(self, request):
-        """Load trang Contact"""
         return render(request, 'contact.html', self.context)
 
 class UserAboutView(UserViews):
+    """Load trang About"""
     def get(self, request):
-        """Load trang About"""
         return render(request, 'about.html', self.context)
 
 class UserLogoutView(UserViews):
+    """Đăng xuất"""
     def get(self, request):
-        """Đăng xuất"""
         logout(request)
         return redirect('home')
 
 class UserLoginView(UserViews):
+    """Đăng nhập"""
     def get(self, request):
         if request.session.get('user_id'):
-            return redirect('home')  # Nếu đã đăng nhập, chuyển hướng đến dashboard
+            return redirect('home')
         return render(request, 'login.html')
      
     def post(self, request):
-        """Đăng nhập"""
         message = ''
         if request.method == 'POST':
             email = request.POST.get('email')
@@ -73,12 +72,12 @@ class UserLoginView(UserViews):
 
         return render(request, 'login.html', {'message': message if 'message' in locals() else ''})
 
-class UserRegisterView(UserViews):  
+class UserRegisterView(UserViews):
+    """Đăng ký""" 
     def get(self, request):
         return render(request, 'register.html')
 
     def post(self, request):
-        """Đăng ký"""
         message = ''
         if request.method == 'POST':
             name, email, password, confirm_password = (
@@ -104,11 +103,11 @@ class UserRegisterView(UserViews):
         return render(request, 'register.html', {'message': message if 'message' in locals() else ''})
 
 class UserUpdateProfileView(UserViews):
+    """Chỉnh sửa thông tin cá nhân"""
     def get(self, request):
         return render(request, 'update.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
 
     def post(self, request):
-        """Chỉnh sửa thông tin cá nhân"""
         message = ''
         if request.method == 'POST' and 'submit' in request.POST:
             name = request.POST.get('name', '').strip()
@@ -149,13 +148,12 @@ class UserUpdateProfileView(UserViews):
         }
         return render(request, 'update.html', context)
 
-class UserLikesView(UserViews):    
+class UserLikesView(UserViews):
+    """Hiển thị tất cả các bài viết mà user đã Like"""
     def get(self, request):
-        """Hiển thị tất cả các bài viết mà user đã Like"""
         post_data = []
 
         if self.user_id:
-            self.initialize_handlers()
             likes = self.like_handler.get_user_likes()
             if likes.exists():
                 post_ids = likes.values_list('post_id', flat=True)
@@ -178,8 +176,8 @@ class UserLikesView(UserViews):
         return render(request, 'user_likes.html', context)
 
 class UserHomeView(UserViews):
+    """Load trang Home"""
     def get(self, request):
-        """Load trang Home"""
         context = {
             'user_name': None,
             'user_comments': 0,
@@ -188,8 +186,6 @@ class UserHomeView(UserViews):
             'authors': [],
             'user_id': self.user_id,
         }
-
-        self.initialize_handlers()
 
         if self.user_id:
             context['user_name'] = self.user_name
@@ -221,15 +217,14 @@ class UserHomeView(UserViews):
         return render(request, 'home.html', context)
 
 class UserCommentsView(UserViews):
+    """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
         return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
 
     def post(self, request):
-        """Hiển thị tất cả comment mà user đã comment"""
         comment_id = None
         edit_comment = None
         message = ''
-        self.initialize_handlers()
         if request.method == "POST":
             if 'edit_comment' in request.POST:
                 edit_comment_id = request.POST.get('edit_comment_id')
@@ -263,10 +258,9 @@ class UserCommentsView(UserViews):
 
         return render(request, 'user_comments.html', context)
 
-class UserLikedPost(UserViews):    
+class UserLikedPost(UserViews):
+    """Like hoặc Unlike bài post"""
     def get(self, request, post_id):
-        """Like hoặc Unlike bài post"""
-        self.initialize_handlers()
         like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
         post = Post.objects.get(id=post_id)
         admin = Admin.objects.get(id=post.admin_id)
@@ -279,12 +273,11 @@ class UserLikedPost(UserViews):
         return redirect(request.META.get('HTTP_REFERER'))
 
 class UserLoadAuthorPosts(UserViews):
+    """Hiển thị các bài post của tác giả tương ứng"""
     def get(self, request, author):
-        """Hiển thị các bài post của tác giả tương ứng"""
         posts = Post.objects.filter(name=author, status='active')
 
         post_data = []
-        self.initialize_handlers()
         for post in posts:
             total_comments = self.comment_handler.get_post_total_comments(post)
             total_likes = self.like_handler.get_post_total_likes(post)
@@ -310,11 +303,10 @@ class UserLoadAuthorPosts(UserViews):
     
 
 class UserLoadAuthors(UserViews):
+    """Hiển thị các tác giả (là admin)"""
     def get(self, request):
-        """Hiển thị các tác giả (là admin)"""
         authors = Admin.objects.all()
         author_stats = []
-        self.initialize_handlers()
         for author in authors:
             total_posts = Post.objects.filter(admin_id=author.id, status='active').count()
 

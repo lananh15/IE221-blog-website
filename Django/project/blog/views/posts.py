@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from ..models import Admin, User, Post, Like, Comment
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.utils import timezone
 
 from .base import BaseView
 from .comments import CommentViews
@@ -11,7 +10,7 @@ from .likes import LikeViews
 class PostsViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.session.get('user_id', None)
-
+        self.initialize_handlers()
         response = super().dispatch(request, *args, **kwargs)
 
         return response
@@ -36,7 +35,6 @@ class PostOfCategory(PostsViews):
         """Hiển thị tất cả bài viết thuộc category"""
         posts = Post.objects.filter(category=category_name, status='active')
         post_data = []
-        self.initialize_handlers()
         is_liked_by_user = None
         if posts.exists():
             for post in posts:
@@ -63,7 +61,6 @@ class PostLoadAllPost(PostsViews):
         posts = Post.objects.filter(status='active')
 
         post_data = []
-        self.initialize_handlers()
         for post in posts:
             total_comments = self.comment_handler.get_post_total_comments(post)
             total_likes = self.like_handler.get_post_total_likes(post)
@@ -86,7 +83,6 @@ class PostLoadAllPost(PostsViews):
 class PostViewPost(PostsViews):
     def get(self, request, post_id):
         post = Post.objects.get(id=post_id, status='active')
-        self.initialize_handlers()
         all_comments = self.comment_handler.get_all_comments(post_id)
         user_comments = self.comment_handler.get_user_comments_of_post(post_id)
 
@@ -114,7 +110,6 @@ class PostViewPost(PostsViews):
         """Hiển thị bài viết có id = post_id"""
         post = Post.objects.get(id=post_id, status='active')
         edit_comment = None
-        self.initialize_handlers()
         if request.method == 'POST' and self.user_id:
             if 'add_comment' in request.POST:
                 comment = request.POST.get('comment')

@@ -15,9 +15,8 @@ import os
 class AdminViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.admin_id = request.session.get('admin_id', None)
-
-        response = super().dispatch(request, *args, **kwargs)
         self.initialize_handlers()
+        response = super().dispatch(request, *args, **kwargs)
 
         return response
     
@@ -143,8 +142,6 @@ class AdminViewPostView(AdminViews):
         
         select_posts = Post.objects.filter(admin_id=self.admin_id)
 
-        self.initialize_handlers()
-
         post_data = []
         for post in select_posts:
             total_post_comments = self.comment_handler.get_post_total_comments(post)
@@ -187,8 +184,6 @@ class AdminGetUsersView(AdminViews):
 
         users = User.objects.all()
         user_data = []
-
-        self.initialize_handlers()
 
         for user in users:
             total_user_comments = Comment.objects.filter(user_id=user.id).count()
@@ -250,7 +245,6 @@ class AdminGetCommentsView(AdminViews):
             return redirect('admin_login')
 
         message = ''
-        self.initialize_handlers()
         comments = Comment.objects.filter(admin_id=self.admin_id)
         comment_data = []
         for comment in comments:
