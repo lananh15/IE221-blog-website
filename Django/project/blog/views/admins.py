@@ -162,7 +162,7 @@ class AdminViewPostView(AdminViews):
             'admin_id': self.admin_id,
             'posts': post_data,
         }
-        return render(request, 'admin/view_post.html', context)
+        return render(request, 'admin/view_posts.html', context)
 
     def post(self, request):
         message = ''

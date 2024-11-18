@@ -471,4 +471,13 @@ def get_user_comments(self):
 - comments này là 1 list các comments mà người dùng hiện tại đã bình luận. 1 comment sẽ chứa các thuộc tính là *id, post_id, admin_id, user_id, user_name, comment, date* nên trong html, **{% for comment in comments %}** là duyệt qua từng comment trong list comments này, lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ comment.comment }}** (Nếu vòng lặp for ghi là **{% for item in comments %}** thì lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ item.comment }}**)
 - Trong vòng lặp for **{% for comment in comments %}**, có chứa **{{ comment.post_id.title }}** lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi **{{ comment.post_id.title }}**. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^
 **Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
+
+### ⚠️ Chú ý các form trong html
+Để submit được form thì phải thêm dòng dưới đây vào dòng đầu tiên của thẻ form:
+```html
+{% csrf_token %}
+```
+Giống như hình:  
+![Screenshot 2024-11-18 122820](https://github.com/user-attachments/assets/a6522ab7-a14f-436a-9b85-01f4f7160ac6)  
+
 ## 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa

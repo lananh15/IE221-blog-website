@@ -27,6 +27,7 @@
    {% if posts %}
       {% for item in posts %}
       <form method="post" class="box">
+         {% csrf_token %}
          <input type="hidden" name="post_id" value="{{ item.post.id }}">
          {% if item.post.image %}
             <img src="{{ item.post.image.url }}" class="image" alt="">
