@@ -149,15 +149,11 @@ class AdminViewPostView(AdminViews):
         
         select_posts = Post.objects.filter(admin_id=self.admin_id)
 
-        post_data = []
-        for post in select_posts:
-            total_post_comments = self.comment_handler.get_post_total_comments(post)
-            total_post_likes = self.like_handler.get_post_total_likes(post)
-            post_data.append({
-                'post': post,
-                'total_post_comments': total_post_comments,
-                'total_post_likes': total_post_likes,
-            })
+        post_data = list(map(lambda post: {
+            'post': post,
+            'total_post_comments': self.comment_handler.get_post_total_comments(post),
+            'total_post_likes': self.like_handler.get_post_total_likes(post),
+        }, select_posts))
 
         context = {
             'admin_name': self.admin_name,
@@ -195,16 +191,12 @@ class AdminGetUsersView(AdminViews):
             return redirect('admin_login')
 
         users = User.objects.all()
-        user_data = []
 
-        for user in users:
-            total_user_comments = Comment.objects.filter(user_id=user.id).count()
-            total_user_likes = Like.objects.filter(user_id=user.id).count()
-            user_data.append({
-                'user': user,
-                'total_user_comments': total_user_comments,
-                'total_user_likes': total_user_likes,
-            })
+        user_data = list(map(lambda user: {
+            'user': user,
+            'total_user_comments': Comment.objects.filter(user_id=user.id).count(),
+            'total_user_likes': Like.objects.filter(user_id=user.id).count(),
+        }, users))
 
         context = {
             'admin_name': admin_name,
@@ -236,13 +228,10 @@ class AdminGetAdminsView(AdminViews):
             return redirect('admin_logout')
 
         admins = Admin.objects.all()
-        admin_data = []
-        for admin in admins:
-            total_admin_posts = Post.objects.filter(admin_id=admin.id).count()
-            admin_data.append({
-                'admin': admin,
-                'total_admin_posts': total_admin_posts,
-            })
+        admin_data = list(map(lambda admin: {
+            'admin': admin,
+            'total_admin_posts': Post.objects.filter(admin_id=admin.id).count(),
+        }, admins))
 
         context = {
             'admin_name': admin_name,
@@ -260,13 +249,10 @@ class AdminGetCommentsView(AdminViews):
 
         message = ''
         comments = Comment.objects.filter(admin_id=self.admin_id)
-        comment_data = []
-        for comment in comments:
-            post = Post.objects.get(id=comment.post_id.id)
-            comment_data.append({
-                'comment': comment,
-                'post': post,
-            })
+        comment_data = list(map(lambda comment: {
+            'comment': comment,
+            'post': Post.objects.get(id=comment.post_id.id),
+        }, comments))
 
         context = {
             'admin_name': admin_name,
@@ -278,10 +264,10 @@ class AdminGetCommentsView(AdminViews):
 
     def post(self, request):
         message = ''
-        if 'delete' in request.POST:
-            comment_id = request.POST.get('comment_id', '').strip()
-            Comment.objects.get(id=comment_id).delete()
-            message = 'Comment deleted!'
+        if 'delete_comment' in request.POST:
+            comment_id = request.POST.get('comment_id', '')
+            if self.comment_handler.delete_comment(comment_id=comment_id, admin_id=self.admin_id):
+                message = "Comment deleted successfully!"
 
         context = {
             'admin_name': self.admin_name,

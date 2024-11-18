@@ -2,10 +2,13 @@ from django.utils import timezone
 from ..models import Like, Comment
 
 class CommentViews:
-    def __init__(self, user_id=None, admin_id=None):
-        self.user_id = user_id
-        self.admin_id = admin_id
+    def __init__(self, **kwargs):
+        self.user_id = kwargs.get('user_id', None)
+        self.admin_id = kwargs.get('admin_id', None)
 
+    def get_current_comment(self, comment_id):
+        """Lấy comment với id=comment_id"""
+        return Comment.objects.get(id=comment_id)
     def get_user_comments(self):
         """Lấy tất cả các bình luận của người dùng đã bình luận"""
         return Comment.objects.filter(user_id=self.user_id)
@@ -26,9 +29,17 @@ class CommentViews:
         """Lấy số lượt bình luận của một bài viết"""
         total_comments = Comment.objects.filter(post_id=post.id).count()
         return total_comments
+
+    def get_admin_comments(self, **kwargs):
+        """Lấy tất cả bình luận của admin"""
+        admin_id = kwargs.get('admin_id')
+        return Comment.objects.filter(admin_id=admin_id)
     
-    def add_comment(self, post, comment_text, user):
+    def add_comment(self, **kwargs):
         """Thêm một bình luận mới"""
+        post = kwargs.get('post')
+        comment_text = kwargs.get('comment_text')
+        user = kwargs.get('user')
         comment = Comment.objects.create(
             post_id=post,
             admin_id=post.admin,
@@ -38,8 +49,10 @@ class CommentViews:
         )
         return comment
     
-    def edit_comment(self, comment_id, comment_text):
+    def edit_comment(self, **kwargs):
         """Chỉnh sửa một bình luận"""
+        comment_id = kwargs.get('comment_id')
+        comment_text = kwargs.get('comment_text')
         comment_to_edit = Comment.objects.filter(id=comment_id, user_id=self.user_id).first()
         if comment_to_edit:
             comment_to_edit.comment = comment_text
@@ -47,9 +60,16 @@ class CommentViews:
             return comment_to_edit
         return None
     
-    def delete_comment(self, comment_id):
-        """User xóa một bình luận"""
-        comment = Comment.objects.filter(id=comment_id, user_id=self.user_id).first()
+    def delete_comment(self, **kwargs):
+        """User và Admin xóa một bình luận"""
+        comment_id = kwargs.get('comment_id')
+        user_id = kwargs.get('user_id', None)
+        admin_id = kwargs.get('admin_id', None)
+        comment = (
+            Comment.objects.filter(id=comment_id, user_id=user_id).first()
+            if user_id
+            else Comment.objects.filter(id=comment_id).first())
+        
         if comment:
             comment.delete()
             return True

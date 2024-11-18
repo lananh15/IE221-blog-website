@@ -2,9 +2,9 @@ from django.utils import timezone
 from ..models import Like, Comment
 
 class LikeViews:
-    def __init__(self, user_id=None, admin_id=None):
-        self.user_id = user_id
-        self.admin_id = admin_id
+    def __init__(self, **kwargs):
+        self.user_id = kwargs.get('user_id', None)
+        self.admin_id = kwargs.get('admin_id', None)
 
     def get_post_total_likes(self, post):
         """Lấy số lượt thích của một bài viết"""
@@ -14,6 +14,11 @@ class LikeViews:
     def get_user_likes(self):
         """Lấy tất cả lượt like của người dùng đã like"""
         return Like.objects.filter(user_id=self.user_id)
+    
+    def get_admin_likes(self, **kwargs):
+        """Lấy tất cả lượt like mà admin nhận được"""
+        admin_id = kwargs.get('admin_id')
+        return Like.objects.filter(admin_id=admin_id)
     
     def user_liked_post(self, post_id):
         """Kiểm tra xem người dùng đã thích bài viết này chưa"""

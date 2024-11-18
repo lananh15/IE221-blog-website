@@ -177,62 +177,33 @@ class UserLikesView(UserViews):
 class UserHomeView(UserViews):
     """Load trang Home"""
     def get(self, request):
+        posts = Post.objects.filter(status='active')[:4]
+
+        post_data = list(map(lambda post: {
+            'post': post,
+            'total_comments': self.comment_handler.get_post_total_comments(post),
+            'total_likes': self.like_handler.get_post_total_likes(post),
+            'is_liked_by_user': self.like_handler.user_liked_post(post.id),
+            'author': (Admin.objects.filter(id=post.admin_id).first() or {}).name,
+            'author_id': (Admin.objects.filter(id=post.admin_id).first() or {}).id,
+        }, posts))
+
         context = {
-            'user_name': None,
-            'user_comments': 0,
-            'user_likes': 0,
-            'posts': [],
-            'authors': [],
+            'user_name': self.user_name,
+            'user_comments': self.comment_handler.get_user_comments().count(),
+            'user_likes': self.like_handler.get_user_likes().count(),
+            'posts': post_data,
+            'authors': Admin.objects.all(),
             'user_id': self.user_id,
         }
 
-        if self.user_id:
-            context['user_name'] = self.user_name
-            context['user_comments'] = self.comment_handler.get_user_comments().count()
-            context['user_likes'] = self.like_handler.get_user_likes().count()
-
-        posts = Post.objects.filter(status='active')[:4]
-        post_data = []
-
-        for post in posts:
-            total_comments = self.comment_handler.get_post_total_comments(post)
-            total_likes = self.like_handler.get_post_total_likes(post)
-            is_liked_by_user = self.like_handler.user_liked_post(post.id)
-            author = Admin.objects.filter(id=post.admin_id).first()
-            post_data.append({
-                'post': post,
-                'total_comments': total_comments,
-                'total_likes': total_likes,
-                'is_liked_by_user': is_liked_by_user,
-                'author': author.name if author else None,
-                'author_id': author.id if author else None,
-            })
-            
-        authors = Admin.objects.all()
-        
-        context['posts'] = post_data
-        context['authors'] = authors
-        
         return render(request, 'home.html', context)
 
 class UserCommentsView(UserViews):
     """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
-        post_data = []
-
         if self.user_id:
             comments = self.comment_handler.get_user_comments()
-            if comments.exists():
-                post_ids = comments.values_list('post_id', flat=True)
-                posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
-                    total_likes=Count('like'),
-                    total_comments=Count('comment')
-                )
-                list(map(lambda post: post_data.append({
-                        'post': post,
-                        'total_post_likes': post.total_likes,
-                        'total_post_comments': post.total_comments,
-                    }), posts))
         
         context = {
             'comments': comments,
@@ -259,17 +230,15 @@ class UserCommentsView(UserViews):
 
             elif 'delete_comment' in request.POST:
                 delete_comment_id = request.POST.get('comment_id')
-                if self.comment_handler.delete_comment(delete_comment_id):
+                if self.comment_handler.delete_comment(comment_id=delete_comment_id, user_id=self.user_id):
                     message = "Comment deleted successfully!"
 
             elif 'open_edit_box' in request.POST:
                 comment_id = request.POST.get('comment_id')
                 edit_comment = self.comment_handler.get_current_comments(comment_id)
 
-        comments = self.comment_handler.get_user_comments()
-
         context = {
-            'comments': comments,
+            'comments': self.comment_handler.get_user_comments(),
             'edit_comment': edit_comment,
             'comment_id': comment_id,
             'message': message,
@@ -300,21 +269,13 @@ class UserLoadAuthorPosts(UserViews):
         author = kwargs.get('author')
         posts = Post.objects.filter(name=author, status='active')
 
-        post_data = []
-        for post in posts:
-            total_comments = self.comment_handler.get_post_total_comments(post)
-            total_likes = self.like_handler.get_post_total_likes(post)
-            if self.user_id:
-                is_liked = self.like_handler.user_liked_post(post.id)
-            else:
-                is_liked = False
+        post_data = list(map(lambda post: {
+            'total_comments': self.comment_handler.get_post_total_comments(post),
+            'total_likes': self.like_handler.get_post_total_likes(post),
+            'is_liked': self.like_handler.user_liked_post(post.id),
+            'post': post
+        }, posts))
 
-            post_data.append({
-                'total_comments': total_comments,
-                'total_likes': total_likes,
-                'is_liked': is_liked,
-                'post': post
-            })
         context = {
             'posts': post_data,
             'author': author,
@@ -329,19 +290,13 @@ class UserLoadAuthors(UserViews):
     """Hiển thị các tác giả (là admin)"""
     def get(self, request):
         authors = Admin.objects.all()
-        author_stats = []
-        for author in authors:
-            total_posts = Post.objects.filter(admin_id=author.id, status='active').count()
 
-            total_likes = Like.objects.filter(admin_id=author.id).count()
-            total_comments = Comment.objects.filter(admin_id=author.id).count()
-            
-            author_stats.append({
-                'name': author.name,
-                'total_posts': total_posts,
-                'total_likes': total_likes,
-                'total_comments': total_comments,
-            })
+        author_stats = list(map(lambda author: {
+            'name': author.name,
+            'total_posts': Post.objects.filter(admin_id=author.id, status='active').count(),
+            'total_likes': self.like_handler.get_admin_likes(admin_id=author.id).count(),
+            'total_comments': self.comment_handler.get_admin_comments(admin_id=author.id).count(),
+        }, authors))
 
         context = {
             'author_stats': author_stats,
