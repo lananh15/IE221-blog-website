@@ -187,17 +187,15 @@ class UserCommentsView(UserViews):
 
             elif 'delete_comment' in request.POST:
                 delete_comment_id = request.POST.get('comment_id')
-                if self.comment_handler.delete_comment(delete_comment_id):
+                if self.comment_handler.delete_comment(comment_id=delete_comment_id, user_id=self.user_id):
                     message = "Comment deleted successfully!"
 
             elif 'open_edit_box' in request.POST:
                 comment_id = request.POST.get('comment_id')
                 edit_comment = self.comment_handler.get_current_comments(comment_id)
 
-        comments = self.comment_handler.get_user_comments()
-
         context = {
-            'comments': comments,
+            'comments': self.comment_handler.get_user_comments(),
             'edit_comment': edit_comment,
             'comment_id': comment_id,
             'message': message,
@@ -216,7 +214,7 @@ Trong hàm post của t có return ra như dưới đây:
 # ví dụ nếu thấy return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
 # thì {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email} chính là context
 context = {
-    'comments': comments,
+    'comments': self.comment_handler.get_user_comments(),
     'edit_comment': edit_comment,
     'comment_id': comment_id,
     'message': message,
@@ -367,29 +365,20 @@ class PostViewPost(PostsViews):
     def get(self, request, **kwargs):
         post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id, status='active')
-        all_comments = self.comment_handler.get_all_comments(post_id)
-        user_comments = self.comment_handler.get_user_comments_of_post(post_id)
-
-        total_post_comments = self.comment_handler.get_post_total_comments(post)
-        total_post_likes = self.like_handler.get_post_total_likes(post)
-        user_liked = False
-
-        if self.user_id:
-            user_liked = self.like_handler.user_liked_post(post.id)
 
         context = {
             'post': post,
-            'all_comments': all_comments,
+            'all_comments': self.comment_handler.get_all_comments(post_id),
             'user_name': self.user_name,
             'user_id': self.user_id,
-            'user_comments': user_comments,
-            'total_post_comments': total_post_comments,
-            'total_post_likes': total_post_likes,
-            'user_liked': user_liked,
+            'user_comments': self.comment_handler.get_user_comments_of_post(post_id),
+            'total_post_comments': self.comment_handler.get_post_total_comments(post),
+            'total_post_likes': self.like_handler.get_post_total_likes(post),
+            'user_liked': self.like_handler.user_liked_post(post.id),
         }
         return render(request, 'view_post.html', context)
 ```
-Mấy hàm mà cần truyền biến kiểu này thì dùng kĩ thuật 2 sao (**kwargs) để thể hiện mình có dùng kĩ thuật cho thầy nha :>  
+Mấy hàm mà cần truyền biến kiểu này thì dùng kĩ thuật 2 sao (**kwargs) để thể hiện mình có dùng kĩ thuật cho thầy nha :> (hoặc truyền biến kiểu tham số bắt buộc cũng được)  
 Do làm **kwargs nên trong html khi truyền biến trong url nên ghi thêm post_id=... để backend mới lấy được giá trị thông qua:
 ```python
 post_id = kwargs.get('post_id')
@@ -406,7 +395,7 @@ Và ví dụ context của lớp UserCommentsView trong **Django/project/blog/vi
 # đoạn code thuộc file Django/project/blog/views/users.py
 
 context = {
-    'comments': comments,
+    'comments': self.comment_handler.get_user_comments(),
     'edit_comment': edit_comment,
     'comment_id': comment_id,
     'message': message,
@@ -458,10 +447,8 @@ Ví dụ 1 đoạn mã trong *user_comments.html*:
 ```
 Và comments trong context của file **Django/project/blog/views/users.py**:
 ```python
-comments = self.comment_handler.get_user_comments()
-
 context = {
-    'comments': comments,
+    'comments': self.comment_handler.get_user_comments(),
     'edit_comment': edit_comment,
     'comment_id': comment_id,
     'message': message,
@@ -471,7 +458,7 @@ context = {
 
 return render(request, 'user_comments.html', context)
 ```
-Và hàm *get_all_comments* trong file **Django/project/blog/views/comments.py**:
+Và hàm *get_user_comments* trong file **Django/project/blog/views/comments.py**:
 ```python
 def get_user_comments(self):
     """Lấy tất cả các bình luận của người dùng đã bình luận"""
@@ -492,4 +479,10 @@ Giống như hình:
 ### ⚠️ Chú ý nơi lưu trữ các file hình ảnh của bài post
 Các file hình ảnh khi admin đăng bài sẽ được lưu vào trong thư mục **Django/project/media** => nên là nhớ code sao để file hình của bài post nó được lưu, xóa, sửa trong thư mục **Django/project/media** nha.
 
+### ⚠️ Chú ý đặt tên cho các lớp
+Với các logic xử lý hiển thị ở các file trong thư mục **Django/project/blog/views** thì nên đặt tên class có tên bắt đầu trùng với tên file.  
+Giả sử file *views/users.py* thì các lớp xử lý logic hiển thị bên trong file này t sẽ đặt tên là User[...] (ví dụ xử lý hiển thị cho trang contact sẽ đặt tên class là UserContactView) thì sau đó bên file *Django/project/blog/urls.py* sẽ import tất cả các class từ file *views/users.py* vào 1 lần như dưới đây:
+```python
+from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost
+```
 ## 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
