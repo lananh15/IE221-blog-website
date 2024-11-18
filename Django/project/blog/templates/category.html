@@ -33,7 +33,7 @@
             <div class="post-admin">
                 <i class="fas fa-user"></i>
                 <div>
-                <a href="{% url 'author_posts' item.post.name %}">{{ item.post.name }}</a>
+                <a href="{% url 'author_posts' author=item.post.name %}">{{ item.post.name }}</a>
                 <div>{{ item.post.date }}</div>
                 </div>
             </div>
@@ -43,9 +43,9 @@
             {% endif %}
             <div class="post-title">{{ item.post.title }}</div>
             <div class="post-content content-150">{{ item.post.content }}</div>
-            <a href="{% url 'view_post' item.post.id %}" class="inline-btn">read more</a>
+            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">read more</a>
             <div class="icons">
-                <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_post_comments }})</span></a>
+                <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_post_comments }})</span></a>
                 <button type="submit" name="like_post"><i class="fas fa-heart" style="{% if item.is_liked_by_user %}color:red;{% endif %}"></i><span>({{ item.total_post_likes }})</span></button>
             </div>
         

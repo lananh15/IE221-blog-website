@@ -260,7 +260,8 @@ class UserCommentsView(UserViews):
 
 class UserLikedPost(UserViews):
     """Like hoặc Unlike bài post"""
-    def get(self, request, post_id):
+    def post(self, request, **kwargs):
+        post_id = kwargs.get('post_id')
         like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
         post = Post.objects.get(id=post_id)
         admin = Admin.objects.get(id=post.admin_id)
@@ -274,7 +275,8 @@ class UserLikedPost(UserViews):
 
 class UserLoadAuthorPosts(UserViews):
     """Hiển thị các bài post của tác giả tương ứng"""
-    def get(self, request, author):
+    def get(self, request, **kwargs):
+        author = kwargs.get('author')
         posts = Post.objects.filter(name=author, status='active')
 
         post_data = []

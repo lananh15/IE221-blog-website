@@ -42,10 +42,10 @@
             
             <div class="post-title">{{ item.post.title }}</div>
             <div class="post-content content-150">{{ item.post.content }}</div>
-            <a href="{% url 'view_post' item.post.id %}" class="inline-btn">Read more</a>
+            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read more</a>
             
             <div class="icons">
-               <a href="{% url 'view_post' item.post.id %}">
+               <a href="{% url 'view_post' post_id=item.post.id %}">
                   <i class="fas fa-comment"></i><span>({{ item.total_post_comments }})</span>
                </a>
                <button type="submit" name="like_post">

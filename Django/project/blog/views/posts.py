@@ -30,9 +30,10 @@ class PostAllCategory(PostsViews):
         }
         return render(request, 'all_category.html', context)
 
-class PostOfCategory(PostsViews):    
-    def get(self, request, category_name):
-        """Hiển thị tất cả bài viết thuộc category"""
+class PostOfCategory(PostsViews):
+    """Hiển thị tất cả bài viết thuộc category""" 
+    def get(self, request, **kwargs):
+        category_name = kwargs.get('category_name')
         posts = Post.objects.filter(category=category_name, status='active')
         post_data = []
         is_liked_by_user = None
@@ -81,7 +82,9 @@ class PostLoadAllPost(PostsViews):
         return render(request, 'posts.html', context)
 
 class PostViewPost(PostsViews):
-    def get(self, request, post_id):
+    """Hiển thị bài viết có id = post_id"""
+    def get(self, request, **kwargs):
+        post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id, status='active')
         all_comments = self.comment_handler.get_all_comments(post_id)
         user_comments = self.comment_handler.get_user_comments_of_post(post_id)
@@ -106,8 +109,8 @@ class PostViewPost(PostsViews):
         return render(request, 'view_post.html', context)
 
     
-    def post(self, request, post_id):
-        """Hiển thị bài viết có id = post_id"""
+    def post(self, request, **kwargs):
+        post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id, status='active')
         edit_comment = None
         if request.method == 'POST' and self.user_id:

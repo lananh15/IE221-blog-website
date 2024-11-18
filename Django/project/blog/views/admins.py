@@ -100,10 +100,12 @@ class AdminLogoutView(AdminViews):
 
 class AdminUpdateProfileView(AdminViews):
     """Xử lý trang update profile phía admin"""
-    def get(self, request, admin_name):
+    def get(self, request, **kwargs):
+        admin_name = kwargs.get('admin_name')
         return render(request, 'admin/update_profile.html', {'admin_name': admin_name, 'admin_id': self.admin_id})
 
-    def post(self, request, admin_name):
+    def post(self, request, **kwargs):
+        admin_name = kwargs.get('admin_name')
         message = []
         admin_id = self.admin_id if admin_name else None
         if 'submit' in request.POST:

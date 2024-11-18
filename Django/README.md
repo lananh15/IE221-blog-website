@@ -336,7 +336,7 @@ Trong *user_comments.html* có chứa các dòng url sau (lấy ví dụ):
 ```html
 <div class="inline-option-btn" onclick="window.location.href = '{% url 'user_comments' %}';">Cancel Edit</div>
 
-<a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+<a href="{% url 'view_post' post_id=comment.post_id.id %}">View Post</a>
 ```
 Tương ứng có các url pattern đã cài trong **Django/project/blog/urls.py**:
 ```python
@@ -354,13 +354,15 @@ Format của path: *path(route, view, kwargs=None, name=None)*, trong đó:
 - name: Tên của route, cho phép bạn tham chiếu URL này ở các nơi khác (như trong file template_name.html) bằng tên thay vì viết lại toàn bộ đường dẫn.  
 
 Dòng **{% url 'user_comments' %}** format là *{% url 'name_of_path_tương_ứng' %}*  
-Dòng **{% url 'view_post' comment.post_id.id %}** format là *{% url 'name_of_path_tương_ứng' biến_truyền_thêm_vào %}*  
+Dòng **{% url 'view_post' post_id=comment.post_id.id %}** format là *{% url 'name_of_path_tương_ứng' biến_truyền_thêm_vào %}*  
 
 Khi nào cần truyền thêm biến vào url? Ví dụ như view_post sẽ truyền thêm biến id của bài post vì khi người dùng click vào Read More của bài viết bất kì, sẽ phải lấy id của bài viết đó truyền cho url và hàm views tương ứng để xử lý hiển thị cho nó, như code dưới đây nhận thêm biến post_id để xử lý hiển thị đúng bài post (tùy trường hợp code mà sẽ cần truyền biến, không thì thôi):
 ```python
 # đoạn code trong file Django/project/blog/views/posts.py
 class PostViewPost(PostsViews):
-    def get(self, request, post_id):
+    """Hiển thị bài viết có id = post_id"""
+    def get(self, request, **kwargs):
+        post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id, status='active')
         all_comments = self.comment_handler.get_all_comments(post_id)
         user_comments = self.comment_handler.get_user_comments_of_post(post_id)
@@ -384,7 +386,11 @@ class PostViewPost(PostsViews):
         }
         return render(request, 'view_post.html', context)
 ```
-
+Mấy hàm mà cần truyền biến kiểu này thì dùng kĩ thuật 2 sao (**kwargs) để thể hiện mình có dùng kĩ thuật cho thầy nha :>  
+Do làm **kwargs nên trong html khi truyền biến trong url nên ghi thêm post_id=... để backend mới lấy được giá trị thông qua:
+```python
+post_id = kwargs.get('post_id')
+```
 ### Django Template Language (DTL)
 Có thể đọc ở https://viblo.asia/p/django-template-language-6J3ZgyRP5mB (quan trọng là mục Tags) để hiểu thêm.  
 #### Gọi biến trong context ra sử dụng:  

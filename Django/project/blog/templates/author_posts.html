@@ -42,9 +42,9 @@
             
             <div class="post-title">{{ item.post.title }}</div>
             <div class="post-content content-150">{{ item.post.content }}</div>
-            <a href="{% url 'view_post' item.post.id %}" class="inline-btn">Read More</a>
+            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read More</a>
             <div class="icons">
-               <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
+               <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
                {% if user_id %}
                    <button type="submit" name="like_post">
                        <i class="fas fa-heart" style="{% if item.is_liked %}color: red;{% endif %}"></i>

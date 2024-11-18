@@ -44,14 +44,14 @@
             
             <div class="post-title">{{ item.post.title }}</div>
             <div class="post-content content-150">{{ item.post.content }}</div>
-            <a href="{% url 'view_post' item.post.id %}" class="inline-btn">Read More</a>
-            <a href="{% url 'category' item.post.category %}" class="post-cat"> 
+            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read More</a>
+            <a href="{% url 'category' category_name=item.post.category %}" class="post-cat"> 
                 <i class="fas fa-tag"></i> 
                 <span>{{ item.post.category }}</span>
             </a>
 
             <div class="icons">
-               <a href="{% url 'view_post' item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
+               <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
                <button type="submit" name="like_post">
                    <i class="fas fa-heart" style="{% if item.is_liked_by_user %}color: red;{% endif %}"></i>
                    <span>({{ item.total_likes }})</span>

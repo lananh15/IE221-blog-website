@@ -38,7 +38,7 @@
             <div class="show-comments">
                <div class="post-title">From: 
                   <span>{{ comment.post_id.title }}</span> 
-                  <a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+                  <a href="{% url 'view_post' post_id=comment.post_id.id %}">View Post</a>
                </div>
                <div class="comment-box">{{ comment.comment }}</div>
                <form action="" method="POST">
