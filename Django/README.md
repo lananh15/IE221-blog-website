@@ -159,21 +159,8 @@ Lấy ví dụ lớp *UserCommentsView* (logic Hiển thị tất cả comment m
 class UserCommentsView(UserViews):
     """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
-        post_data = []
-
         if self.user_id:
             comments = self.comment_handler.get_user_comments()
-            if comments.exists():
-                post_ids = comments.values_list('post_id', flat=True)
-                posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
-                    total_likes=Count('like'),
-                    total_comments=Count('comment')
-                )
-                list(map(lambda post: post_data.append({
-                        'post': post,
-                        'total_post_likes': post.total_likes,
-                        'total_post_comments': post.total_comments,
-                    }), posts))
         
         context = {
             'comments': comments,
