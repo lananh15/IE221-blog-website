@@ -271,7 +271,7 @@ Tương ứng với định dạng url trong file **Django/project/blog/urls.py*
             <div class="show-comments">
                <div class="post-title">From: 
                   <span>{{ comment.post_id.title }}</span> 
-                  <a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+                  <a href="{% url 'view_post' post_id=comment.post_id.id %}">View Post</a>
                </div>
                <div class="comment-box">{{ comment.comment }}</div>
                <form action="" method="POST">
@@ -433,19 +433,19 @@ Ví dụ 1 đoạn mã trong *user_comments.html*:
 ```html
 <div class="user-comments-container">
     {% if comments %}
-        {% for comment in comments %}
+     {% for comment in comments %}
         <div class="show-comments">
-            <div class="post-title">From: 
+           <div class="post-title">From: 
               <span>{{ comment.post_id.title }}</span> 
-              <a href="{% url 'view_post' comment.post_id.id %}">View Post</a>
+              <a href="{% url 'view_post' post_id=comment.post_id.id %}">View Post</a>
             </div>
             <div class="comment-box">{{ comment.comment }}</div>
             <form action="" method="POST">
-              {% csrf_token %}
-              <input type="hidden" name="comment_id" value="{{ comment.id }}">
-              <button type="submit" class="inline-option-btn" name="open_edit_box">Edit Comment</button>
-              <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete Comment</button>
-           </form>
+                {% csrf_token %}
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <button type="submit" class="inline-option-btn" name="open_edit_box">Edit Comment</button>
+                <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete Comment</button>
+            </form>
         </div>
         {% endfor %}
     {% else %}
