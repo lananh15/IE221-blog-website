@@ -476,10 +476,10 @@ def get_user_comments(self):
 Giống như hình:  
 ![Screenshot 2024-11-18 122820](https://github.com/user-attachments/assets/a6522ab7-a14f-436a-9b85-01f4f7160ac6)  
 
-### ⚠️ Chú ý nơi lưu trữ các file hình ảnh của bài post
+## ⚠️ Chú ý nơi lưu trữ các file hình ảnh của bài post
 Các file hình ảnh khi admin đăng bài sẽ được lưu vào trong thư mục **Django/project/media** => nên là nhớ code sao để file hình của bài post nó được lưu, xóa, sửa trong thư mục **Django/project/media** nha.
 
-### ⚠️ Chú ý đặt tên cho các lớp
+## ⚠️ Chú ý đặt tên cho các lớp
 Với các logic xử lý hiển thị ở các file trong thư mục **Django/project/blog/views** thì nên đặt tên class có tên bắt đầu trùng với tên file.  
 Giả sử file *views/users.py* thì các lớp xử lý logic hiển thị bên trong file này t sẽ đặt tên là User[...] (ví dụ xử lý hiển thị cho trang contact sẽ đặt tên class là UserContactView) thì sau đó bên file *Django/project/blog/urls.py* sẽ import tất cả các class từ file *views/users.py* vào 1 lần như dưới đây:
 ```python
