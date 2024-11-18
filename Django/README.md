@@ -480,4 +480,7 @@ def get_user_comments(self):
 Giống như hình:  
 ![Screenshot 2024-11-18 122820](https://github.com/user-attachments/assets/a6522ab7-a14f-436a-9b85-01f4f7160ac6)  
 
+### ⚠️ Chú ý nơi lưu trữ các file hình ảnh của bài post
+Các file hình ảnh khi admin đăng bài sẽ được lưu vào trong thư mục **Django/project/media** => nên là nhớ code sao để file hình của bài post nó được lưu, xóa, sửa trong thư mục **Django/project/media** nha.
+
 ## 😊 Cảm ơn mn! Có gì ko hiểu thì hỏi t nhaaa
