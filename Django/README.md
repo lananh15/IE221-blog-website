@@ -477,7 +477,8 @@ Giống như hình:
 ![Screenshot 2024-11-18 122820](https://github.com/user-attachments/assets/a6522ab7-a14f-436a-9b85-01f4f7160ac6)  
 
 ## ⚠️ Chú ý nơi lưu trữ các file hình ảnh của bài post
-Các file hình ảnh khi admin đăng bài sẽ được lưu vào trong thư mục **Django/project/media** => nên là nhớ code sao để file hình của bài post nó được lưu, xóa, sửa trong thư mục **Django/project/media** nha.
+Các file hình ảnh khi admin đăng bài sẽ được lưu vào trong thư mục **Django/project/media** => nên là nhớ code sao để file hình của bài post nó được lưu, xóa, sửa trong thư mục **Django/project/media** nha.  
+![Screenshot 2024-11-18 152755](https://github.com/user-attachments/assets/36ea74bf-9cc1-447e-88db-bc7d9bbef48a)  
 
 ## ⚠️ Chú ý đặt tên cho các lớp
 Với các logic xử lý hiển thị ở các file trong thư mục **Django/project/blog/views** thì nên đặt tên class có tên bắt đầu trùng với tên file.  
