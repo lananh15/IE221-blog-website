@@ -161,12 +161,11 @@ class UserLikesView(UserViews):
                     total_likes=Count('like'),
                     total_comments=Count('comment')
                 )
-                for post in posts:
-                    post_data.append({
+                list(map(lambda post: post_data.append({
                         'post': post,
                         'total_post_likes': post.total_likes,
                         'total_post_comments': post.total_comments,
-                    })
+                    }), posts))
         
         context = {
             'posts': post_data,
@@ -219,7 +218,29 @@ class UserHomeView(UserViews):
 class UserCommentsView(UserViews):
     """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
-        return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+        post_data = []
+
+        if self.user_id:
+            comments = self.comment_handler.get_user_comments()
+            if comments.exists():
+                post_ids = comments.values_list('post_id', flat=True)
+                posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
+                    total_likes=Count('like'),
+                    total_comments=Count('comment')
+                )
+                list(map(lambda post: post_data.append({
+                        'post': post,
+                        'total_post_likes': post.total_likes,
+                        'total_post_comments': post.total_comments,
+                    }), posts))
+        
+        context = {
+            'comments': comments,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+
+        return render(request, 'user_comments.html', context)
 
     def post(self, request):
         comment_id = None

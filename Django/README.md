@@ -159,7 +159,29 @@ Lấy ví dụ lớp *UserCommentsView* (logic Hiển thị tất cả comment m
 class UserCommentsView(UserViews):
     """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
-        return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+        post_data = []
+
+        if self.user_id:
+            comments = self.comment_handler.get_user_comments()
+            if comments.exists():
+                post_ids = comments.values_list('post_id', flat=True)
+                posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
+                    total_likes=Count('like'),
+                    total_comments=Count('comment')
+                )
+                list(map(lambda post: post_data.append({
+                        'post': post,
+                        'total_post_likes': post.total_likes,
+                        'total_post_comments': post.total_comments,
+                    }), posts))
+        
+        context = {
+            'comments': comments,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+
+        return render(request, 'user_comments.html', context)
 
     def post(self, request):
         comment_id = None
@@ -200,18 +222,12 @@ class UserCommentsView(UserViews):
 ```
 Tức là khi người dùng truy cập vào url chứa /user-comments là GET á thì nó sẽ chạy hàm get của lớp UserCommentsView; nếu người dùng nhấn button gì đó của form như là nhấn Delete comment tức là phương thức POST thì nó sẽ chạy hàm post của lớp UserCommentsView. (trong class-based view này chỉ chạy 2 phương thức là GET và POST thôi, và đó là lý do tại sao các class trong users.py của t chỉ có 1 hoặc cả 2 hàm get và post tùy theo trang đó có form để dùng POST hay không nếu chỉ là trang hiển thị bình thường không có có form xóa sửa gì thì chỉ cần hàm get là đủ).  
 
-Trong hàm get của t có return ra như dưới đây:
+Trong hàm post của t có return ra như dưới đây:
 ```python
 # đoạn code thuộc file Django/project/blog/views/users.py
-
 # format render của Django là render(request, 'template_name.html', context)
-# trong đó {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email} chính là context
-return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
-```
-Hoặc trong hàm post của t có return ra như dưới đây:
-```python
-# đoạn code thuộc file Django/project/blog/views/users.py
-
+# ví dụ nếu thấy return render(request, 'user_comments.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+# thì {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email} chính là context
 context = {
     'comments': comments,
     'edit_comment': edit_comment,
@@ -475,7 +491,7 @@ def get_user_comments(self):
     return Comment.objects.filter(user_id=self.user_id)
 ```
 - comments này là 1 list các comments mà người dùng hiện tại đã bình luận. 1 comment sẽ chứa các thuộc tính là *id, post_id, admin_id, user_id, user_name, comment, date* nên trong html, **{% for comment in comments %}** là duyệt qua từng comment trong list comments này, lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ comment.comment }}** (Nếu vòng lặp for ghi là **{% for item in comments %}** thì lấy nội dung comment của từng comment sẽ truy cập thuộc tính comment theo kiểu **{{ item.comment }}**)
-- Trong vòng lặp for **{% for comment in comments %}**, có chứa **{{ comment.post_id.title }}** lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi **{{ comment.post_id.title }}**. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^
+- Trong vòng lặp for **{% for comment in comments %}**, có chứa **{{ comment.post_id.title }}** lấy title của bài viết, kiểu post_id là khóa ngoại nối giữa 2 bảng là **post** và **comment**, trong bảng post có title nên khi lấy title bài viết tương ứng với comment đó thì phải thông qua khóa ngoại post_id á, nên phải ghi **{{ comment.post_id.title }}**. Ngoài ra lúc code nếu muốn lấy kiểu gì thì mn cứ hỏi chatgpt hoặc xem lỗi nó báo như thế nào rồi fix theo miễn ra đúng là được ^^  
 **Lưu ý:** trong DTL thì if phải có endif, for phải có endfor nha.
 
 ### ⚠️ Chú ý các form trong html
