@@ -3,6 +3,14 @@ Trong thư mục **Django/project** sẽ có các thư mục *blog, cert, projec
 
 Tuyệt đối ko chỉnh sửa hay đụng tới thư mục *models, static, cert*, và các file như *Django/project/blog/middleware.py, Django/project/blog/views/base.py*
 
+Trước khi chạy code thì bật terminal của thư mục Django lên:
+![Screenshot 2024-11-25 122842](https://github.com/user-attachments/assets/4225ceaf-cf13-46ae-876b-4bccfe8cdfbe)  
+Sau đó chạy lệnh: 
+```bash
+pip install -r requirements.txt
+```
+Trong thư mục **Django/project/project** sẽ có 1 file là .env chứa biến môi trường (không public để bảo mật), file này khi push code lên bị gitignore ẩn đi rồi, t gửi file .env này vào mess, mn tải về bỏ vào thư mục **Django/project/project** nha
+
 ### ⚠️ Chú ý
 Thư mục Django này là chỗ chính thức để tụi mình code đồ án (tức là chuyển mấy code php kia sang python thì sẽ làm trong thư mục này khi nào xong hết đồ án thì tụi mình xóa mấy file php bên ngoài thư mục Django này).  
 Nhưng mà hiện tại t mới fix bên phía người dùng thôi, còn admin thì chưa sửa hết.
@@ -94,6 +102,11 @@ self.user_id
 # Tương tự, gọi được self.user, self.user_name, self.user_email, self.admin, self.admin_name
 ```
 
+## 📝 Mô tả tổng quát quy trình code
+- Tạo file giao diện người dùng (.html) trong thư mục templates
+- Xử lý các logic liên quan file giao diện đó ở thư mục views (ví dụ giao diện home.html thì liên quan user nên vào file views/users.py để tạo class UserHomeView và code logic cho nó)
+- Cấu hình url của home trong file blog/urls.py
+Đọc tiếp các phần bên dưới sẽ cụ thể hơn.
 ## ⚠️ Lưu ý các file trong thư mục Django/project/blog/models
 Hiện tại database t đã tích hợp vào rồi, mọi người cứ làm thôi ko cần chạy lệnh makemigrate hay gì đâu, cứ runserver là được.  
 Cấu trúc file của thư mục models:  
