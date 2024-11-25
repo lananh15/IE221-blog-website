@@ -1,6 +1,6 @@
 from django.urls import path
 from .views.admins import AdminLoginView, AdminDashboardView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView
-from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost
+from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost, UserVerification, UserResendOTP, UserForgetPassword
 from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
 
 urlpatterns = [
@@ -19,6 +19,9 @@ urlpatterns = [
     path('user-likes', UserLikesView.as_view(), name='user_likes'),
     path('user-comments', UserCommentsView.as_view(), name='user_comments'),
     path('like-post/<int:post_id>', UserLikedPost.as_view(), name='like_post'),
+    path('verification/', UserVerification.as_view(), name='verification'),
+    path('resend-otp/', UserResendOTP.as_view(), name='resend_otp'),
+    path('forget-password/', UserForgetPassword.as_view(), name='forget_password'),
 
     # Post
     path('all-category/', PostAllCategory.as_view(), name='all_category'),

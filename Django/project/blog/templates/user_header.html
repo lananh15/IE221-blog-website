@@ -43,12 +43,4 @@
 
    </section>
 
-   {% if messages %}
-      {% for message in messages %}
-      <div class="message">
-         <span>{{ message }}</span>
-         <i class="fas fa-times" onclick="$(this).parent().remove();"></i>
-      </div>
-      {% endfor %}
-   {% endif %}
 </header>

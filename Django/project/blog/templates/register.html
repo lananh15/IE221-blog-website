@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,32 @@
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
    <!-- custom css file link  -->
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   <style>
+   .btn-google {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      color: black;
+      padding: 10px 20px;
+      border-radius: 2rem;
+      text-decoration: none;
+      font-size: 1.6rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      border: 2px solid var(--grey-900); /* Viền màu xám */
+
+   }
+
+   .btn-google i {
+      margin-right: 1rem;
+      font-size: 2rem;
+   }
+
+   .btn-google:hover {
+      background-color: var(--grey-900); /* Nền sáng hơn khi hover */
+      color: black;
+   }
+   </style>
 
 </head>
 <body>
@@ -21,6 +48,11 @@
    <form action="" method="post">
       {% csrf_token %}
       <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
+      <a href="{% provider_login_url 'google' %}?next=/"
+         class="btn btn-google">
+         <i class="fab fa-google"></i>
+         Continue with Google
+      </a>
       <div class="divider">
          <span>OR</span>
       </div>
@@ -29,9 +61,9 @@
       {% endif %}
       
       <label class="label-form">Your Name</label>
-      <input type="text" name="name" required class="box" maxlength="50">
+      <input type="text" name="name" required class="box" maxlength="100">
       <label class="label-form">Email</label>
-      <input type="email" name="email" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <input type="email" name="email" required class="box" maxlength="128" oninput="this.value = this.value.replace(/\s/g, '')">
       <label class="label-form">Password</label>
       <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
       <label class="label-form">Confirm Password</label>

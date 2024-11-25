@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +7,38 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Login</title>
-   
+
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
    <!-- custom css file link  -->
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   <style>
+   .btn-google {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      color: black;
+      padding: 10px 20px;
+      border-radius: 2rem;
+      text-decoration: none;
+      font-size: 1.6rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      border: 2px solid var(--grey-900); /* Viền màu xám */
 
+   }
+
+   .btn-google i {
+      margin-right: 1rem;
+      font-size: 2rem;
+   }
+
+   .btn-google:hover {
+      background-color: var(--grey-900); /* Nền sáng hơn khi hover */
+      color: black;
+   }
+   </style>
 </head>
 <body>
 
@@ -21,6 +47,12 @@
    <form action="" method="post">
       {% csrf_token %}
       <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
+      <a href="{% provider_login_url 'google' %}?next=/"
+         class="btn btn-google">
+         <i class="fab fa-google"></i>
+         Continue with Google
+      </a>
+      
       <div class="divider">
          <span>OR</span>
       </div>
@@ -33,6 +65,7 @@
       <input type="email" name="email" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
       <label class="label-form">Password</label>
       <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+      <p style="text-align: left; padding-bottom: .6rem; font-size:1.5rem"><a style="color: black;" href="{% url 'forget_password' %}">Forget Password?</a></p>
       <input type="submit" value="Login" name="submit" class="btn">
       <p>Don't have an account yet? <a href="{% url 'register' %}">Register</a></p>
    </form>

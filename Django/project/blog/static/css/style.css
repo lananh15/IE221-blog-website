@@ -353,6 +353,15 @@ section{
    width: 50rem;
 }
 
+.form-container #otp-verification, .form-container #forget-password{
+   background-color: var(--white);
+   border-radius: 1rem;
+   border:var(--border);
+   box-shadow: var(--box-shadow);
+}
+#otp-verification h3, #forget-password h3{
+   padding: 1rem 0 0 0;
+}
 .divider {
     display: flex;
     align-items: center;
@@ -394,8 +403,9 @@ section{
 }
 
 .form-container form p{
-   padding-top: 1.5rem;
-   font-size: 1.8rem;
+   /* padding-top: 1rem; */
+   padding: 1rem 0;
+   font-size: 1.6rem;
    color:var(--light-color);
 }
 

@@ -44,6 +44,7 @@ class CommentViews:
             post_id=post,
             admin_id=post.admin,
             user_id=user,
+            user_name=user.name,
             comment=comment_text,
             date=timezone.now(),
         )
