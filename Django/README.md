@@ -5,7 +5,7 @@ Tuyệt đối ko chỉnh sửa hay đụng tới thư mục *models, static, ce
 
 Trước khi chạy code thì bật terminal của thư mục Django lên:
 ![Screenshot 2024-11-25 122842](https://github.com/user-attachments/assets/4225ceaf-cf13-46ae-876b-4bccfe8cdfbe)  
-Sau đó chạy lệnh: 
+Sau đó chạy lệnh dưới đây để install các thư viện cần thiết trong đồ án này: 
 ```bash
 pip install -r requirements.txt
 ```
