@@ -245,8 +245,9 @@ class UserUpdateProfileView(UserViews):
             if email and User.objects.filter(email=email).exclude(id=self.user_id).exists():
                     message = 'Email already taken!'
             else:
-                self.user.email = email
-                self.user.save()
+                if email:
+                    self.user.email = email
+                    self.user.save()
 
             old_pass = request.POST.get('old_pass', '')
             new_pass = request.POST.get('new_pass', '')
