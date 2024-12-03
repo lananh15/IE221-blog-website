@@ -1,5 +1,5 @@
-from django.urls import path
-from .views.admins import AdminLoginView, AdminDashboardView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView
+from django.urls import path, include
+from .views.admins import AdminLoginView, AdminDashboardView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView, AdminAddPostView
 from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost, UserVerification, UserResendOTP, UserForgetPassword
 from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
 
@@ -35,6 +35,8 @@ urlpatterns = [
     path('dashboard/', AdminDashboardView.as_view(), name='dashboard'),
     path('update-profile/<str:admin_name>/', AdminUpdateProfileView.as_view(), name='admin_update_profile'),
     path('view-post/', AdminViewPostView.as_view(), name='admin_view_post'),
+    path('add-post/', AdminAddPostView.as_view(), name='add_post'),
+    path('tinymce/', include('tinymce.urls')),
     path('users-accounts', AdminGetUsersView.as_view(), name='users_accounts'),
     path('admin-accounts', AdminGetAdminsView.as_view(), name='admin_accounts'),
     path('comments', AdminGetCommentsView.as_view(), name='comments'),

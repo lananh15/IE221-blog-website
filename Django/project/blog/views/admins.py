@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib import messages
 from django.utils import timezone
 
 from ..models import Admin, User, Post, Like, Comment
+from ..models.posts_forms import PostForm  
 from .base import BaseView
 from .comments import CommentViews
 from .likes import LikeViews
@@ -276,3 +278,45 @@ class AdminGetCommentsView(AdminViews):
         }
 
         return render(request, 'admin/comments.html', context)
+    
+class AdminAddPostView(AdminViews):
+    template_name = 'admin/add_post.html'
+    
+    def get(self, request):
+        # Sử dụng get_admin_context() để kiểm tra authentication
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+        
+        form = PostForm()
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'form': form
+        }
+        return render(request, self.template_name, context)
+    
+    def post(self, request):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+        
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.admin = self.admin
+            post.status = 'active' if 'publish' in request.POST else 'deactive'
+            post.content = form.cleaned_data['content'] 
+            post.save()
+            messages.success(request, 'Post published!' if post.status == 'active' else 'Draft saved!')
+            return redirect('add_post')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            print(form.errors)
+        
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'form': form
+        }
+        return render(request, self.template_name, context)
