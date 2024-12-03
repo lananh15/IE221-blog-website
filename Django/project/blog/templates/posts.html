@@ -43,7 +43,7 @@
             {% endif %}
             
             <div class="post-title">{{ item.post.title }}</div>
-            <div class="post-content content-150">{{ item.post.content }}</div>
+            <div class="post-content content-150">{{ item.post.content|safe }}</div>
             <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read More</a>
             <a href="{% url 'category' category_name=item.post.category %}" class="post-cat"> 
                 <i class="fas fa-tag"></i> 
