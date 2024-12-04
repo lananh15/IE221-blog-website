@@ -130,4 +130,3 @@ class PostViewPost(PostsViews):
             'message': message
         }
         return render(request, 'view_post.html', context)
-

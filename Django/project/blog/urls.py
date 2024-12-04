@@ -2,6 +2,7 @@ from django.urls import path, include
 from .views.admins import AdminLoginView, AdminDashboardView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView, AdminAddPostView
 from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost, UserVerification, UserResendOTP, UserForgetPassword
 from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
+from .views.search import SearchPostView
 
 urlpatterns = [
     # User
@@ -40,4 +41,7 @@ urlpatterns = [
     path('users-accounts', AdminGetUsersView.as_view(), name='users_accounts'),
     path('admin-accounts', AdminGetAdminsView.as_view(), name='admin_accounts'),
     path('comments', AdminGetCommentsView.as_view(), name='comments'),
+    
+    # Search 
+    path('search/', SearchPostView.as_view(), name='search'),
 ]
