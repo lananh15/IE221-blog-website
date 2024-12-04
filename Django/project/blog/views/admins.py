@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
 
 from ..models import Admin, User, Post, Like, Comment
 from ..models.posts_forms import PostForm  
@@ -320,3 +321,32 @@ class AdminAddPostView(AdminViews):
             'form': form
         }
         return render(request, self.template_name, context)
+    
+    
+class AdminRegisterView(AdminViews):
+    """Đăng ký""" 
+    def get(self, request):
+        return render(request, 'admin/register_admin.html')
+
+    def post(self, request):
+        message = ''
+        if request.method == 'POST':
+            name, password, confirm_password = (
+                request.POST.get('name'),
+                request.POST.get('pass'),
+                request.POST.get('cpass'),
+            )
+            
+            if Admin.objects.filter(name=name).exists():
+                message = 'Username already exists!'
+            else:
+                if password != confirm_password:
+                    message = 'Confirm password not matched!'
+                else:
+                    hashed_password = make_password(password)
+                    request.session['name'] = name
+                    request.session['password'] = hashed_password
+
+                    return redirect('admin_login')
+
+        return render(request, 'admin/register_admin.html', {'message': message if 'message' in locals() else ''})
