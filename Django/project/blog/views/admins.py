@@ -343,9 +343,13 @@ class AdminRegisterView(AdminViews):
                 if password != confirm_password:
                     message = 'Confirm password not matched!'
                 else:
-                    hashed_password = make_password(password)
+                    hashed_password = hashlib.sha1(password.encode()).hexdigest()
                     request.session['name'] = name
                     request.session['password'] = hashed_password
+                    
+                    Admin.objects.create(name=name, password=hashed_password)
+                    del request.session['name']
+                    del request.session['password']
 
                     return redirect('admin_login')
 
