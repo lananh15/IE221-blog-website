@@ -146,30 +146,24 @@ class AdminUpdateProfileView(AdminViews):
 
 class AdminViewPostView(AdminViews):
     """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
-    def get(self, request, post_id):
-        admin_name = self.get_admin_context()
-        if admin_name is None:
+    def get(self, request):
+        if self.admin_id is None:
             return redirect('admin_login')
+        
+        select_posts = Post.objects.filter(admin_id=self.admin_id)
 
-        try:
-            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
-        except Post.DoesNotExist:
-            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
-
-        comments = Comment.objects.filter(post_id=post.id).order_by('-date')
-
-        # Tính tổng lượt thích và bình luận
-        post.total_likes = self.like_handler.get_post_total_likes(post)
-        post.total_comments = comments.count()
+        post_data = list(map(lambda post: {
+            'post': post,
+            'total_post_comments': self.comment_handler.get_post_total_comments(post),
+            'total_post_likes': self.like_handler.get_post_total_likes(post),
+        }, select_posts))
 
         context = {
-            'admin_name': admin_name,
+            'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'post': post,
-            'comments': comments,
+            'posts': post_data,
         }
-        return render(request, 'admin/read_post.html', context)
-    
+        return render(request, 'admin/view_posts.html', context)
 
     def post(self, request):
         message = ''
@@ -193,8 +187,7 @@ class AdminViewPostView(AdminViews):
         return render(request, 'admin/view_post.html', context)
 
 
-
-# Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng 
+# Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng, lấy id đối chiếuchiếu
 #tại view_post.html
 class AdminReadPostView(AdminViews):
     """Xem chi tiết bài viết và các bình luận liên quan"""
@@ -230,6 +223,44 @@ class AdminReadPostView(AdminViews):
                 comment.delete()
             except Comment.DoesNotExist:
                 pass  # Nếu comment không tồn tại, bỏ qua
+
+        return redirect('admin_read_post', post_id=post_id)
+    
+
+class AdminEditPostView(AdminViews):
+    """Chỉnh sửa bài viết"""
+    def get(self, request, post_id):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+
+        context = {
+            'admin_name': admin_name,
+            'admin_id': self.admin_id,
+            'post': post,
+        }
+        return render(request, 'admin/edit_post.html', context)
+
+    def post(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')
+
+        # Cập nhật dữ liệu bài viết
+        post.title = request.POST.get('title', post.title)
+        post.content = request.POST.get('content', post.content)
+        post.status = request.POST.get('status', post.status)
+
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+
+        post.save()
 
         return redirect('admin_read_post', post_id=post_id)
 

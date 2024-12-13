@@ -1,0 +1,53 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Post Details</title>
+
+   <!-- Font Awesome CDN Link -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+<section class="edit-post">
+   <div class="box">
+      <h1 class="heading">Chỉnh sửa bài viết</h1>
+      <form method="post" enctype="multipart/form-data">
+         {% csrf_token %}
+         <label for="title">Tiêu đề</label>
+         <input type="text" name="title" id="title" value="{{ post.title }}" required class="input">
+
+         <label for="content">Nội dung</label>
+         <textarea name="content" id="content" required class="textarea">{{ post.content }}</textarea>
+
+         <label for="status">Trạng thái</label>
+         <select name="status" id="status" class="select">
+            <option value="active" {% if post.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if post.status == 'deactivedeactive' %}selected{% endif %}>DeactiveDeactive</option>
+         </select>
+
+         <label for="image">Hình ảnh</label>
+         <input type="file" name="image" id="image" class="input">
+         {% if post.image %}
+         <img src="{{ post.image.url }}" alt="Post Image" class="preview-image">
+         {% endif %}
+
+         <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </form>
+   </div>
+</section>
+
+<!-- Custom JS file link -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>
