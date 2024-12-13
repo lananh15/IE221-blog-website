@@ -146,24 +146,30 @@ class AdminUpdateProfileView(AdminViews):
 
 class AdminViewPostView(AdminViews):
     """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
-    def get(self, request):
-        if self.admin_id is None:
+    def get(self, request, post_id):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
             return redirect('admin_login')
-        
-        select_posts = Post.objects.filter(admin_id=self.admin_id)
 
-        post_data = list(map(lambda post: {
-            'post': post,
-            'total_post_comments': self.comment_handler.get_post_total_comments(post),
-            'total_post_likes': self.like_handler.get_post_total_likes(post),
-        }, select_posts))
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+
+        comments = Comment.objects.filter(post_id=post.id).order_by('-date')
+
+        # Tính tổng lượt thích và bình luận
+        post.total_likes = self.like_handler.get_post_total_likes(post)
+        post.total_comments = comments.count()
 
         context = {
-            'admin_name': self.admin_name,
+            'admin_name': admin_name,
             'admin_id': self.admin_id,
-            'posts': post_data,
+            'post': post,
+            'comments': comments,
         }
-        return render(request, 'admin/view_posts.html', context)
+        return render(request, 'admin/read_post.html', context)
+    
 
     def post(self, request):
         message = ''
@@ -185,6 +191,47 @@ class AdminViewPostView(AdminViews):
             'message': message,
         }
         return render(request, 'admin/view_post.html', context)
+
+
+
+# Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng 
+#tại view_post.html
+class AdminReadPostView(AdminViews):
+    """Xem chi tiết bài viết và các bình luận liên quan"""
+    def get(self, request, post_id):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+
+        comments = Comment.objects.filter(post_id=post.id).order_by('-date')
+
+        # Bổ sung tổng lượt thích và bình luận
+        post.total_likes = self.like_handler.get_post_total_likes(post)
+        post.total_comments = comments.count()
+
+        context = {
+            'admin_name': admin_name,
+            'admin_id': self.admin_id,
+            'post': post,
+            'comments': comments,
+        }
+        return render(request, 'admin/read_post.html', context)
+
+    def post(self, request, post_id):
+        if 'delete_comment' in request.POST:
+            comment_id = request.POST.get('comment_id', '')
+            try:
+                comment = Comment.objects.get(id=comment_id, post_id=post_id, admin_id=self.admin_id)
+                comment.delete()
+            except Comment.DoesNotExist:
+                pass  # Nếu comment không tồn tại, bỏ qua
+
+        return redirect('admin_read_post', post_id=post_id)
 
 class AdminGetUsersView(AdminViews):
     """Lấy thông tin tất cả user đang có trên web"""

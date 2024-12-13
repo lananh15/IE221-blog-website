@@ -40,10 +40,12 @@
             <div class="comments"><i class="fas fa-comment"></i><span>{{ item.total_post_comments }}</span></div>
          </div>
          <div class="flex-btn">
-            <a href="edit_post.php?id=<?= $post_id; ?>" class="option-btn">edit</a>
+            <!-- <a href="edit_post.php?id=<?= $post_id; ?>" class="option-btn">edit</a> -->
             <button type="submit" name="delete" class="delete-btn" onclick="return confirm('Delete this post?');">delete</button>
          </div>
-         <a href="read_post.php?post_id=<?= $post_id; ?>" class="btn">view post</a>
+         <a href="{% url 'admin_read_post' item.post.id %}" class="btn btn-primary">View</a>
+
+
       </form>
          {% endfor %}
       {% else %}
