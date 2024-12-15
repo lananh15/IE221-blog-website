@@ -21,7 +21,7 @@
 
 <section class="show-posts">
 
-   <h1 class="heading">your posts</h1>
+   <h1 class="heading">Bài viết của bạn</h1>
 
    <div class="box-container">
    {% if posts %}
@@ -40,16 +40,15 @@
             <div class="comments"><i class="fas fa-comment"></i><span>{{ item.total_post_comments }}</span></div>
          </div>
          <div class="flex-btn">
-            <!-- <a href="edit_post.php?id=<?= $post_id; ?>" class="option-btn">edit</a> -->
-            <button type="submit" name="delete" class="delete-btn" onclick="return confirm('Delete this post?');">delete</button>
-         </div>
-         <a href="{% url 'admin_read_post' item.post.id %}" class="btn btn-primary">View</a>
+            <button type="submit" name="delete" class="delete-btn" onclick="return confirm('Bạn có chắc muốn xóa bài viết này?');">Xóa</button>
+        </div>
+         <a href="{% url 'admin_read_post' item.post.id %}" class="btn btn-primary">Xem bài viết</a>
 
 
       </form>
          {% endfor %}
       {% else %}
-         <p class="empty">No posts added yet! <a href="add_posts.php" class="btn" style="margin-top:1.5rem;">add post</a></p>';
+         <p class="empty">Chưa có bài viết nào được thêm<a href="add_posts.php" class="btn" style="margin-top:1.5rem;">Thêm bài viết mới</a></p>';
       {% endif %}
    </div>
 
