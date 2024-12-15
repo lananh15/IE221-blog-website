@@ -186,6 +186,102 @@ class AdminViewPostView(AdminViews):
         }
         return render(request, 'admin/view_post.html', context)
 
+
+# Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng, lấy id đối chiếuchiếu
+#tại view_post.html
+class AdminReadPostView(AdminViews):
+    """Xem chi tiết bài viết và các bình luận liên quan"""
+    def get(self, request, post_id):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+
+        comments = Comment.objects.filter(post_id=post.id).order_by('-date')
+
+
+        # Hiện tổng lượt like và comment
+        post.total_likes = self.like_handler.get_post_total_likes(post)
+        post.total_comments = self.comment_handler.get_post_total_comments(post)
+
+        context = {
+            'admin_name': admin_name,
+            'admin_id': self.admin_id,
+            'post': post,
+            'comments': comments,
+        }
+        return render(request, 'admin/read_post.html', context)
+    
+
+    #Cho phép xóa cmt tại chỗ xem chi tiết bài viết
+    def post(self, request, post_id):
+        if 'delete_comment' in request.POST:
+            comment_id = request.POST.get('comment_id', '')
+            try:
+                comment = Comment.objects.get(id=comment_id, post_id=post_id, admin_id=self.admin_id)
+                comment.delete()
+            except Comment.DoesNotExist:
+                pass 
+
+        return redirect('admin_read_post', post_id=post_id)
+
+
+    def post(self, request):
+        if 'post_id' in request.POST:
+            post_id = request.POST.get('post_id')
+            try:
+                # Tìm và xóa bài viết
+                post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+                post.delete()
+            except Post.DoesNotExist:
+                pass  # Nếu bài viết không tồn tại, bỏ qua
+            
+        return redirect('admin_view_post')  # Quay lại danh sách bài viết sau khi xóa
+    
+
+class AdminEditPostView(AdminViews):
+    """Chỉnh sửa bài viết"""
+    def get(self, request, post_id):
+        admin_name = self.get_admin_context()
+        if admin_name is None:
+            return redirect('admin_login')
+
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+
+        # Tạo form với dữ liệu của bài viết hiện tại
+        form = PostForm(instance=post)
+
+        context = {
+            'admin_name': admin_name,
+            'admin_id': self.admin_id,
+            'post': post,
+            'form': form,
+        }
+        return render(request, 'admin/edit_post.html', context)
+
+    def post(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id, admin_id=self.admin_id)
+        except Post.DoesNotExist:
+            return redirect('admin_posts')
+
+        form = PostForm(request.POST, request.FILES, instance=post)
+
+        if form.is_valid():
+            form.save()  # Lưu dữ liệu từ form
+
+            return redirect('admin_read_post', post_id=post_id)
+        else:
+            # Trả về form với lỗi nếu không hợp lệ
+            return render(request, 'admin/edit_post.html', {'form': form, 'post': post})
+
 class AdminGetUsersView(AdminViews):
     """Lấy thông tin tất cả user đang có trên web"""
     def get(self, request):

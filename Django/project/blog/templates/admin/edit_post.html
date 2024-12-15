@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ form.media }} <!-- Đảm bảo TinyMCE được load -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post</title>
+
+    <!-- Font Awesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+    <!-- Custom CSS file link -->
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+</head>
+
+<body>
+
+    {% include 'admin/admin_header.html' %}
+
+    <section class="post-editor">
+
+
+       <h1 class="heading">Chỉnh sửa bài viết</h1>
+
+       <form method="post" enctype="multipart/form-data">
+           {% csrf_token %}
+           <p>Tên hiển thị của bạn <span>*</span></p>
+           {{ form.name }} 
+           <p>Tiêu đề bài viết <span>*</span></p>
+           {{ form.title }} 
+
+           <p>Nội dung bài viết <span>*</span></p>
+           {{ form.content }}  <!-- Hiển thị trường nội dung với TinyMCE -->
+
+           <p>Danh mục bài viết <span>*</span></p>
+           {{ form.category }}  
+           <p>Hình ảnh bài viết</p>
+           {% if post.image %}
+               <img src="{{ post.image.url }}" alt="Post Image" class="image">
+           {% endif %}
+           {{ form.image }}  
+
+           <div class="flex-btn">
+               <button type="submit" class="btn">Cập nhật</button>
+           </div>
+       </form>
+    </section>
+
+    <!-- Custom JS file link -->
+    <script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>

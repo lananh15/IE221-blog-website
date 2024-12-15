@@ -629,6 +629,21 @@ section{
 
 
 
+.status {
+   border-radius: .5rem;
+   padding: 1rem 2.5rem;
+   font-size: 2rem;
+   color: var(--white);
+   display: inline-block;
+}
+
+.status.active {
+   background-color: limegreen;
+}
+
+.status.inactive {
+   background-color: coral;
+}
 
 
 

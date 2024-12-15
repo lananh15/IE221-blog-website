@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Post Details</title>
+
+   <!-- Font Awesome CDN Link -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+   <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
+
+   <!-- Custom CSS file link -->
+   <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+</head>
+<body>
+
+{% include 'admin/admin_header.html' %}
+
+<!-- <section class="post-details">
+   <div class="box">
+      <h1 class="heading">Chi tiết bài viết</h1>
+      
+      <div class="title">{{ post.title }}</div>
+      {% if post.image %}
+      <img src="{{ post.image.url }}" alt="Post Image" class="image">
+      {% endif %}
+      <p>{{ post.content }}</p>
+      <div class="status">Status: <span>{{ post.status }}</span></div>
+   </div>
+</section>
+
+<section class="comments-section">
+   <h1 class="heading">Comments</h1>
+   <div class="box-container">
+      {% if comments %}
+         {% for comment in comments %}
+         <div class="box">
+            <div class="comment-user">
+               <i class="fas fa-user"></i>
+               <span>{{ comment.user_name }}</span>
+               <div>{{ comment.date }}</div>
+            </div>
+            <p class="comment-box">{{ comment.content }}</p>
+            <form method="post" class="flex-btn">
+               {% csrf_token %}
+               <input type="hidden" name="comment_id" value="{{ comment.id }}">
+               <button type="submit" name="delete_comment" class="delete-btn" onclick="return confirm('Delete this comment?');">Delete</button>
+            </form>
+         </div>
+         {% endfor %}
+      {% else %}
+         <p class="empty">No comments added yet!</p>
+      {% endif %}
+   </div>
+</section> -->
+
+<section class="read-post">
+   <form method="post">
+      {% csrf_token %}
+      <h1 class="heading">Chi tiết bài viết</h1>
+
+      <!-- Hiển thị tiêu đề -->
+      <div class="title">{{ post.title }}</div>
+
+      <!-- Hiển thị hình ảnh nếu có -->
+      {% if post.image %}
+      <img src="{{ post.image.url }}" alt="Post Image" class="image">
+      {% endif %}
+
+      <!-- Nội dung bài viết -->
+      <div class="content">{{ post.content }}</div>
+
+      <!-- Trạng thái bài viết -->
+      <div class="status {% if post.status == 'active' %}active{% else %}inactive{% endif %}">
+         {{ post.status }}
+      </div>
+
+      <!-- Lượt thích và bình luận -->
+      <div class="icons">
+         <div class="likes">
+            <i class="fas fa-heart"></i> <span>{{ post.total_likes }}</span> Lượt thích
+         </div>
+         <div class="comments">
+            <i class="fas fa-comment"></i> <span>{{ post.total_comments }}</span> Bình luận
+         </div>
+      </div>
+
+      <div class="actions">
+         <a href="{% url 'admin_edit_post' post.id %}" class="btn btn-secondary">Chỉnh sửa bài viết</a>
+      </div>
+      
+   </form>
+</section>
+
+<section class="comments">
+   <div class="comment-title">Bình luận</div>
+   <div class="box-container">
+      {% for comment in comments %}
+      <div class="box">
+         <!-- Thông tin người dùng -->
+         <div class="user">
+            <i class="fas fa-user"></i>
+            <div class="user-info">
+               <span>{{ comment.user_name }}</span>
+               <div>{{ comment.date|date:"d/m/Y H:i" }}</div>
+            </div>
+         </div>
+
+         <!-- Nội dung bình luận -->
+         <div class="text">{{ comment.comment }}</div>
+
+         <!-- Nút xóa bình luận -->
+         <form method="post" class="delete-form">
+            {% csrf_token %}
+            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+            <button type="submit" name="delete_comment" class="delete-btn" onclick="return confirm('Xóa bình luận này?');">
+               Xóa bình luận
+            </button>
+         </form>
+      </div>
+      {% empty %}
+      <p class="empty">Chưa có bình luận nào cho bài viết này.</p>
+      {% endfor %}
+   </div>
+</section>
+
+
+<!-- Custom JS file link -->
+<script src="{% static 'js/admin_script.js' %}"></script>
+
+</body>
+</html>
