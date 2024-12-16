@@ -1,12 +1,12 @@
 from django.urls import path, include
-from .views.admins import AdminEditPostView, AdminLoginView, AdminDashboardView, AdminReadPostView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView, AdminAddPostView
+from .views.admins import AdminEditPostView, AdminLoginView, AdminDashboardView, AdminReadPostView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView, AdminAddPostView, AdminViewActivePostView, AdminViewDeactivePostView
 from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost, UserVerification, UserResendOTP, UserForgetPassword
 from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
 from .views.search import SearchPostView
 
 urlpatterns = [
     # User
-    # path('search/', views.search, name='search'),
+    path('search/', SearchPostView.as_view(), name='search'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='user_logout'),
     path('register/', UserRegisterView.as_view(), name='register'),
@@ -36,6 +36,8 @@ urlpatterns = [
     path('dashboard/', AdminDashboardView.as_view(), name='dashboard'),
     path('update-profile/<str:admin_name>/', AdminUpdateProfileView.as_view(), name='admin_update_profile'),
     path('view-post/', AdminViewPostView.as_view(), name='admin_view_post'),
+    path('view-active-post/', AdminViewActivePostView.as_view(), name='admin_view_active_post'),
+    path('view-deactive-post/', AdminViewDeactivePostView.as_view(), name='admin_view_deactive_post'),
     path('add-post/', AdminAddPostView.as_view(), name='add_post'),
     path('tinymce/', include('tinymce.urls')),
     path('users-accounts', AdminGetUsersView.as_view(), name='users_accounts'),
@@ -44,6 +46,4 @@ urlpatterns = [
     path('admin-read-post/<int:post_id>/', AdminReadPostView.as_view(), name='admin_read_post'),
     path('admin-edit-post/<int:post_id>/', AdminEditPostView.as_view(), name='admin_edit_post'),
     
-    # Search 
-    path('search/', SearchPostView.as_view(), name='search'),
 ]

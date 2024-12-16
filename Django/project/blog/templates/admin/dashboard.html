@@ -36,19 +36,19 @@
    <div class="box">
       <h3>{{ numbers_of_posts }}</h3>
       <p>Bài viết đã được thêm</p>
-      <a href="add_posts.php" class="btn">Thêm bài viết mới</a>
+      <a href="{% url 'add_post' %}" class="btn">Thêm bài viết mới</a>
    </div>
 
    <div class="box">
       <h3>{{ numbers_of_active_posts }}</h3>
       <p>Bài viết đang hoạt động</p>
-      <a href="{% url 'admin_view_post' %}" class="btn">Xem bài viết</a>
+      <a href="{% url 'admin_view_active_post' %}" class="btn">Xem bài viết</a>
    </div>
 
    <div class="box">
       <h3>{{ numbers_of_deactive_posts }}</h3>
       <p>Bài viết bị vô hiệu hóa</p>
-      <a href="{% url 'admin_view_post' %}" class="btn">Xem bài viết</a>
+      <a href="{% url 'admin_view_deactive_post' %}" class="btn">Xem bài viết</a>
    </div>
 
    <div class="box">

@@ -20,7 +20,6 @@ class PostsViews(BaseView):
         self.comment_handler = CommentViews(user_id=self.user_id)
         self.like_handler = LikeViews(user_id=self.user_id)
 
-
 class PostAllCategory(PostsViews):
     def get(self, request):
         """Hiển thị tất cả category"""
@@ -31,8 +30,8 @@ class PostAllCategory(PostsViews):
         return render(request, 'all_category.html', context)
 
 class PostOfCategory(PostsViews):
-    """Hiển thị tất cả bài viết thuộc category""" 
     def get(self, request, **kwargs):
+        """Hiển thị tất cả bài viết thuộc category""" 
         category_name = kwargs.get('category_name')
         posts = Post.objects.filter(category=category_name, status='Đang hoạt động')
         post_data = []
@@ -72,8 +71,8 @@ class PostLoadAllPost(PostsViews):
         return render(request, 'posts.html', context)
 
 class PostViewPost(PostsViews):
-    """Hiển thị bài viết có id = post_id"""
     def get(self, request, **kwargs):
+        """Hiển thị bài viết có id = post_id"""
         post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id, status='Đang hoạt động')
 
@@ -91,6 +90,7 @@ class PostViewPost(PostsViews):
 
     
     def post(self, request, **kwargs):
+        """User thêm, xóa, sửa comment"""
         post_id = kwargs.get('post_id')
         message = ''
         post = Post.objects.get(id=post_id, status='Đang hoạt động')

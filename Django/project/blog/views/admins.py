@@ -41,6 +41,17 @@ class AdminViews(BaseView):
             return None
         return admin_name
     
+    def get_posts_by_status(self, status):
+        select_posts = Post.objects.filter(status=status)
+
+        post_data = list(map(lambda post: {
+            'post': post,
+            'total_post_comments': self.comment_handler.get_post_total_comments(post),
+            'total_post_likes': self.like_handler.get_post_total_likes(post),
+        }, select_posts))
+
+        return post_data
+    
 
 class AdminLoginView(AdminViews):
     """Hiển thị trang login phía admin"""
@@ -145,8 +156,8 @@ class AdminUpdateProfileView(AdminViews):
         return render(request, 'admin/update_profile.html', context)
 
 class AdminViewPostView(AdminViews):
-    """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
     def get(self, request):
+        """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
         if self.admin_id is None:
             return redirect('admin_login')
         
@@ -184,7 +195,76 @@ class AdminViewPostView(AdminViews):
             'admin_id': self.admin_id,
             'message': message,
         }
-        return render(request, 'admin/view_post.html', context)
+        return render(request, 'admin/view_posts.html', context)
+
+class AdminViewActivePostView(AdminViews):    
+    def get(self, request):
+        """Xem tất cả các bài viết đang hoạt động"""
+        if self.admin_id is None:
+            return redirect('admin_login')
+        
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'posts': self.get_posts_by_status(status='Đang hoạt động'),
+        }
+        return render(request, 'admin/view_posts.html', context)
+
+    def post(self, request):
+        message = ''
+        if 'delete' in request.POST:
+            p_id = request.POST.get('post_id', '').strip()
+            post = Post.objects.get(id=p_id)
+
+            if post.image != '':
+                image_path = post.image.path
+                if os.path.isfile(image_path):
+                    os.remove(image_path)
+
+            post.delete()
+            Comment.objects.filter(post_id=p_id).delete()
+            message = 'Bài viết đã được xóa thành công!'
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'posts': self.get_active_posts(),
+            'message': message,
+        }
+        return render(request, 'admin/view_posts.html', context)
+
+class AdminViewDeactivePostView(AdminViews):
+    def get(self, request):
+        """Xem tất cả các bài viết đang hoạt động"""
+        if self.admin_id is None:
+            return redirect('admin_login')
+
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'posts': self.get_posts_by_status(status='Vô hiệu hóa'),
+        }
+        return render(request, 'admin/view_posts.html', context)
+
+    def post(self, request):
+        message = ''
+        if 'delete' in request.POST:
+            p_id = request.POST.get('post_id', '').strip()
+            post = Post.objects.get(id=p_id)
+
+            if post.image != '':
+                image_path = post.image.path
+                if os.path.isfile(image_path):
+                    os.remove(image_path)
+
+            post.delete()
+            Comment.objects.filter(post_id=p_id).delete()
+            message = 'Bài viết đã được xóa thành công!'
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'message': message,
+        }
+        return render(request, 'admin/view_posts.html', context)
 
 
 # Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng, lấy id đối chiếuchiếu
