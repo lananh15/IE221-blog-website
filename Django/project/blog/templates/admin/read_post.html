@@ -70,7 +70,7 @@
       {% endif %}
 
       <!-- Nội dung bài viết -->
-      <div class="content">{{ post.content }}</div>
+      <div class="content">{{ post.content|safe }}</div>
 
       <!-- Trạng thái bài viết -->
       <div class="status {% if post.status == 'Đang hoạt động' %}active{% else %}inactive{% endif %}">

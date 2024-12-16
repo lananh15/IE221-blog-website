@@ -5,7 +5,7 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Authors</title>
+   <title>Các tác giả</title>
 
    <!-- Font Awesome CDN link -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -19,22 +19,22 @@
 
 <section class="simple-content">
 
-   <h1 class="heading">Authors</h1>
+   <h1 class="heading">Các tác giả</h1>
 
    <div class="box-container">
 
       {% if author_stats %}
          {% for author in author_stats %}
          <div class="box">
-            <p>Author : <span>{{ author.name }}</span></p>
-            <p>Total posts : <span>{{ author.total_posts }}</span></p>
-            <p>Posts likes : <span>{{ author.total_likes }}</span></p>
-            <p>Posts comments : <span>{{ author.total_comments }}</span></p>
-            <a href="{% url 'author_posts' author.name %}" class="btn">View posts</a>
+            <p>Tác giả : <span>{{ author.name }}</span></p>
+            <p>Tổng số bài viết : <span>{{ author.total_posts }}</span></p>
+            <p>Tổng lượt thích nhận được : <span>{{ author.total_likes }}</span></p>
+            <p>Tổng lượt bình luận nhận được : <span>{{ author.total_comments }}</span></p>
+            <a href="{% url 'author_posts' author.name %}" class="btn">Xem các bài viết</a>
          </div>
          {% endfor %}
       {% else %}
-         <p class="empty">No authors found</p>
+         <p class="empty">Không tìm thấy tác giả nào</p>
       {% endif %}
 
    </div>

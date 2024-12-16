@@ -60,12 +60,13 @@
       
       </form>
       {% else %}
-         <p class="empty">Không tìm thấy bài viết nào!</p>
+         <p class="empty">Không tìm thấy bài viết!</p>
       {% endif %}
    </div>
 
 </section>
 
+{% if post %}
 <section class="comments-container">
    <p class="comment-title">Thêm bình luận</p>
    {% if user_id %}
@@ -113,6 +114,7 @@
    </div>
 
 </section>
+{% endif %}
 {% include 'footer.html' %}
 
 <script src="{% static 'js/script.js' %}"></script>

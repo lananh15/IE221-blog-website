@@ -34,7 +34,7 @@
          {% endif %}
          <div class="status" style="background-color:{% if item.post.status == 'Đang hoạt động' %}limegreen; {% else %}coral;{% endif %}">{{ item.post.status }}</div>
             <div class="title">{{ item.post.title }}</div>
-         <div class="posts-content">{{ item.post.content }}</div>
+         <div class="posts-content">{{ item.post.content|safe }}</div>
          <div class="icons">
             <div class="likes"><i class="fas fa-heart"></i><span>{{ item.total_post_likes }}</span></div>
             <div class="comments"><i class="fas fa-comment"></i><span>{{ item.total_post_comments }}</span></div>

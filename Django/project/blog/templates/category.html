@@ -42,7 +42,7 @@
             <img src="{{ item.post.image.url }}" class="post-image" alt="">
             {% endif %}
             <div class="post-title">{{ item.post.title }}</div>
-            <div class="post-content content-150">{{ item.post.content }}</div>
+            <div class="post-content content-150">{{ item.post.content|safe }}</div>
             <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">đọc thêm</a>
             <div class="icons">
                 <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_post_comments }})</span></a>

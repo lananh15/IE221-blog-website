@@ -268,7 +268,6 @@ class UserLikesView(UserViews):
     """Hiển thị tất cả các bài viết mà user đã Like"""
     def get(self, request):
         post_data = []
-
         if self.user_id:
             likes = self.like_handler.get_user_likes()
             if likes.exists():

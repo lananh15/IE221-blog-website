@@ -41,7 +41,7 @@
             {% endif %}
             
             <div class="post-title">{{ item.post.title }}</div>
-            <div class="post-content content-150">{{ item.post.content }}</div>
+            <div class="post-content content-150">{{ item.post.content|safe }}</div>
             <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Đọc thêm</a>
             
             <div class="icons">
@@ -56,7 +56,7 @@
          </form>
          {% endfor %}
       {% else %}
-         <p class="empty">Chưa có bài viết nào được thích!</p>
+         <p class="empty">Không tìm thấy bài viết!</p>
       {% endif %}
    </div>
 

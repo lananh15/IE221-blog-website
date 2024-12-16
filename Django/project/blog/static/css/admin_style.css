@@ -420,6 +420,7 @@ section{
    color:var(--light-color);
    line-height: 1.5;
    padding:1rem 0;
+   margin: 0 2rem;
 }
 
 .show-posts .box-container .box .posts-content::after{

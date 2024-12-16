@@ -5,7 +5,7 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Posts</title>
+   <title>Tìm bài viết</title>
 
    <!-- Font Awesome CDN link -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -50,7 +50,7 @@
               {% endif %}
               
               <div class="post-title">{{ item.post.title }}</div>
-              <div class="post-content content-150">{{ item.post.content }}</div>
+              <div class="post-content content-150">{{ item.post.content|safe }}</div>
               <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Đọc thêm</a>
               {% if item.post.category %}
                   <a href="{% url 'category' category_name=item.post.category %}" class="post-cat"> 

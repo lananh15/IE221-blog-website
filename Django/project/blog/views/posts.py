@@ -72,20 +72,21 @@ class PostLoadAllPost(PostsViews):
 
 class PostViewPost(PostsViews):
     def get(self, request, **kwargs):
-        """Hiển thị bài viết có id = post_id"""
+        """Hiển thị 1 bài viết có id = post_id"""
         post_id = kwargs.get('post_id')
-        post = Post.objects.get(id=post_id, status='Đang hoạt động')
-
-        context = {
-            'post': post,
-            'all_comments': self.comment_handler.get_all_comments(post_id),
-            'user_name': self.user_name,
-            'user_id': self.user_id,
-            'user_comments': self.comment_handler.get_user_comments_of_post(post_id),
-            'total_post_comments': self.comment_handler.get_post_total_comments(post),
-            'total_post_likes': self.like_handler.get_post_total_likes(post),
-            'user_liked': self.like_handler.user_liked_post(post.id),
-        }
+        post = Post.objects.get(id=post_id)
+        context = {}
+        if post.status == 'Đang hoạt động':
+            context = {
+                'post': post,
+                'all_comments': self.comment_handler.get_all_comments(post_id),
+                'user_name': self.user_name,
+                'user_id': self.user_id,
+                'user_comments': self.comment_handler.get_user_comments_of_post(post_id),
+                'total_post_comments': self.comment_handler.get_post_total_comments(post),
+                'total_post_likes': self.like_handler.get_post_total_likes(post),
+                'user_liked': self.like_handler.user_liked_post(post.id),
+            }
         return render(request, 'view_post.html', context)
 
     

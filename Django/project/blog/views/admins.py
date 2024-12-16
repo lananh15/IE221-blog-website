@@ -66,8 +66,7 @@ class AdminLoginView(AdminViews):
 
         try:
             admin = Admin.objects.get(name=name)
-            hashed_password = hashlib.sha1(password.encode()).hexdigest()
-            if hashed_password == admin.password:
+            if check_password(password, admin.password):
                 request.session['admin_id'] = admin.id
                 return redirect('dashboard')
             else:
@@ -86,7 +85,7 @@ class AdminDashboardView(AdminViews, View):
 
         numbers_of_posts = Post.objects.filter(admin_id=self.admin_id).count()
         numbers_of_active_posts = Post.objects.filter(admin_id=self.admin_id, status='Đang hoạt động').count()
-        numbers_of_deactive_posts = Post.objects.filter(admin_id=self.admin_id, status='Vô hiệu hóa').count()
+        numbers_of_deactive_posts = Post.objects.filter(admin_id=self.admin_id, status='Ngừng hoạt động').count()
         numbers_of_users = User.objects.all().count()
         numbers_of_admins = Admin.objects.all().count()
         numbers_of_comments = Comment.objects.filter(admin_id=self.admin_id).count()
@@ -241,7 +240,7 @@ class AdminViewDeactivePostView(AdminViews):
         context = {
             'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'posts': self.get_posts_by_status(status='Vô hiệu hóa'),
+            'posts': self.get_posts_by_status(status='Ngừng hoạt động'),
         }
         return render(request, 'admin/view_posts.html', context)
 
@@ -483,7 +482,7 @@ class AdminAddPostView(AdminViews):
         if form.is_valid():
             post = form.save(commit=False)
             post.admin = self.admin
-            post.status = 'Đang hoạt động' if 'publish' in request.POST else 'Vô hiệu hóa'
+            post.status = 'Đang hoạt động' if 'publish' in request.POST else 'Ngừng hoạt động'
             post.content = form.cleaned_data['content'] 
             post.save()
             messages.success(request, 'Bài viết đã được xuất bản!' if post.status == 'Đang hoạt động' else 'Bản nháp đã được lưu!')
