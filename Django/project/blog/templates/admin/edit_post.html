@@ -27,6 +27,12 @@
 
        <form method="post" enctype="multipart/form-data">
            {% csrf_token %}
+           <p>Trạng thái bài viết <span>*</span></p>
+            <select name="status" class="box">
+                <option value="Đang hoạt động" {% if post.status == "Đang hoạt động" %}selected{% endif %}>Đang hoạt động</option>
+                <option value="Ngừng hoạt động" {% if post.status == "Ngừng hoạt động" %}selected{% endif %}>Ngừng hoạt động</option>
+            </select>
+
            <p>Tên hiển thị của bạn <span>*</span></p>
            {{ form.name }} 
            <p>Tiêu đề bài viết <span>*</span></p>

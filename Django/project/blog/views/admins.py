@@ -333,14 +333,11 @@ class AdminEditPostView(AdminViews):
         try:
             post = Post.objects.get(id=post_id, admin_id=self.admin_id)
         except Post.DoesNotExist:
-            return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
+            return redirect('admin_posts')
 
-        # Tạo form với dữ liệu của bài viết hiện tại
         form = PostForm(instance=post)
-
         context = {
             'admin_name': admin_name,
-            'admin_id': self.admin_id,
             'post': post,
             'form': form,
         }
@@ -353,14 +350,18 @@ class AdminEditPostView(AdminViews):
             return redirect('admin_posts')
 
         form = PostForm(request.POST, request.FILES, instance=post)
-
         if form.is_valid():
-            form.save()  # Lưu dữ liệu từ form
-
+            post = form.save(commit=False)
+            # Xử lý trạng thái
+            post.status = request.POST.get('status', post.status)
+            post.save()
             return redirect('admin_read_post', post_id=post_id)
-        else:
-            # Trả về form với lỗi nếu không hợp lệ
-            return render(request, 'admin/edit_post.html', {'form': form, 'post': post})
+
+        context = {
+            'form': form,
+            'post': post,
+        }
+        return render(request, 'admin/edit_post.html', context)
 
 class AdminGetUsersView(AdminViews):
     """Lấy thông tin tất cả user đang có trên web"""
