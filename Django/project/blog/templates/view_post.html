@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Post</title>
+   <title>Bài viết</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -20,11 +20,11 @@
 
    {% if comment_id %}
    <section class="comment-edit-form">
-   <p>Edit your comment</p>
+   <p>Chỉnh sửa bình luận của bạn</p>
    <form action="" method="POST">
       {% csrf_token %}
       <input type="hidden" name="edit_comment_id" value="{{ comment_id }}">
-      <textarea name="comment_edit_box" required cols="30" rows="10" placeholder="Please enter your comment">{{ edit_comment.comment }}</textarea>
+      <textarea name="comment_edit_box" required cols="30" rows="10" placeholder="Vui lòng nhập bình luận của bạn">{{ edit_comment.comment }}</textarea>
       <button type="submit" class="inline-btn" name="edit_comment">Edit comment</button>
       <div class="inline-option-btn" onclick="window.location.href = '{% url 'view_post' post_id=post.id %}';">Cancel</div>
    </form>
@@ -60,31 +60,31 @@
       
       </form>
       {% else %}
-         <p class="empty">No posts found!</p>
+         <p class="empty">Không tìm thấy bài viết nào!</p>
       {% endif %}
    </div>
 
 </section>
 
 <section class="comments-container">
-   <p class="comment-title">Add comment</p>
+   <p class="comment-title">Thêm bình luận</p>
    {% if user_id %}
    <form action="" method="post" class="add-comment">
       {% csrf_token %}
       <input type="hidden" name="admin_id" value="{{ post.admin_id }}">
       <input type="hidden" name="user_name" value="{{ user_name }}">
       <p class="user"><i class="fas fa-user"></i><a href="{% url 'update_profile' %}">{{ user_name }}</a></p>
-      <textarea name="comment" maxlength="1000" class="comment-box" cols="30" rows="10" placeholder="Write your comment..." required></textarea>
+      <textarea name="comment" maxlength="1000" class="comment-box" cols="30" rows="10" placeholder="Viết bình luận..." required></textarea>
       <input type="submit" value="add comment" class="inline-btn" name="add_comment">
    </form>
    {% else %}
    <div class="add-comment">
-      <p>Please login to add or edit your comment</p>
-      <a href="{% url 'login' %}" class="inline-btn">Login</a>
+      <p>Vui lòng đăng nhập để thêm hoặc chỉnh sửa bình luận</p>
+      <a href="{% url 'login' %}" class="inline-btn">Đăng nhập</a>
    </div>
    {% endif %}
    
-   <p class="comment-title">Post comments</p>
+   <p class="comment-title">Bình luận</p>
    <div class="user-comments-container">
       {% if all_comments %}
          {% for comment in all_comments %}
@@ -101,14 +101,14 @@
                   <form action="" method="POST">
                      {% csrf_token %}
                      <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                     <button type="submit" class="inline-option-btn" name="open_edit_box">Edit comment</button>
-                     <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete comment</button>
+                     <button type="submit" class="inline-option-btn" name="open_edit_box">Chỉnh sửa bình luận</button>
+                     <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Xóa bình luận này?');">Xóa bình luận</button>
                   </form>
                {% endif %}
             </div>
          {% endfor %}
       {% else %}
-         <p class="empty">No comments added yet!</p>
+         <p class="empty">Chưa có bình luận nào được thêm!</p>
       {% endif %}
    </div>
 

@@ -1,12 +1,12 @@
 {% load static %}
 {% load socialaccount %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Register</title>
+   <title>Đăng ký</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -51,25 +51,25 @@
       <a href="{% provider_login_url 'google' %}?next=/"
          class="btn btn-google">
          <i class="fab fa-google"></i>
-         Continue with Google
+         Tiếp tục với Google
       </a>
       <div class="divider">
-         <span>OR</span>
+         <span>HOẶC</span>
       </div>
       {% if message %}
       <p class="error">{{ message }}</p>  <!-- Hiển thị thông báo lỗi nếu có -->
       {% endif %}
       
-      <label class="label-form">Your Name</label>
+      <label class="label-form">Tên của bạn</label>
       <input type="text" name="name" required class="box" maxlength="100">
       <label class="label-form">Email</label>
       <input type="email" name="email" required class="box" maxlength="128" oninput="this.value = this.value.replace(/\s/g, '')">
-      <label class="label-form">Password</label>
+      <label class="label-form">Mật khẩu</label>
       <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <label class="label-form">Confirm Password</label>
+      <label class="label-form">Nhập lại mật khẩu</label>
       <input type="password" name="cpass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="submit" value="Register" name="submit" class="btn">
-      <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+      <input type="submit" value="Đăng ký" name="submit" class="btn">
+      <p>Đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập</a></p>
    </form>
 
 </section>

@@ -1,12 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     {{ form.media }}
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Add Post</title>
+   <title>Thêm bài viết</title>
 
    <!-- font awesome cdn link -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -23,33 +23,33 @@
 
     <section class="post-editor">
 
-       <h1 class="heading">Add New Post</h1>
+       <h1 class="heading">Thêm bài viết mới</h1>
 
        <form action="{% url 'add_post' %}" method="post" enctype="multipart/form-data">
            {% csrf_token %}
-           <p>Your Name <span>*</span></p>
-           <input type="text" name="name" class="box" required placeholder="Enter your name" value="{{ form.name.value|default:'' }}">
+           <p>Tên tác giả <span>*</span></p>
+           <input type="text" name="name" class="box" required placeholder="Nhập tên hoặc bí danh của bạn" value="{{ form.name.value|default:'' }}">
            
-           <p>Post Title <span>*</span></p>
-           <input type="text" name="title" class="box" required placeholder="Add post title" value="{{ form.title.value|default:'' }}">
+           <p>Tiêu đề bài viết <span>*</span></p>
+           <input type="text" name="title" class="box" required placeholder="Nhập tiêu đề bài viết" value="{{ form.title.value|default:'' }}">
            
-           <p>Post Content <span>*</span></p>
+           <p>Nội dung bài viết <span>*</span></p>
            {{ form.content }} 
            
-           <p>Post Category <span>*</span></p>
+           <p>Danh mục bài viết <span>*</span></p>
            <select name="category" class="box" required>
-               <option value="" selected disabled>-- Select Category --</option>
+               <option value="" selected disabled>-- Chọn danh mục --</option>
                <option value="c++" {% if form.category.value == "c++" %}selected{% endif %}>C++</option>
                <option value="python" {% if form.category.value == "python" %}selected{% endif %}>Python</option>
                <option value="c#" {% if form.category.value == "c#" %}selected{% endif %}>C#</option>
            </select>
            
-           <p>Post Image</p>
+           <p>Hình ảnh bài viết</p>
            <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png, image/webp">
            
            <div class="flex-btn">
-               <button type="submit" name="publish" class="btn">Publish Post</button>
-               <button type="submit" name="draft" class="option-btn">Save Draft</button>
+               <button type="submit" name="publish" class="btn">Xuất bản bài viết</button>
+               <button type="submit" name="draft" class="option-btn">Lưu bản nháp</button>
            </div>
        </form>
 

@@ -74,8 +74,8 @@ class AdminDashboardView(AdminViews, View):
             return redirect('admin_login')
 
         numbers_of_posts = Post.objects.filter(admin_id=self.admin_id).count()
-        numbers_of_active_posts = Post.objects.filter(admin_id=self.admin_id, status='active').count()
-        numbers_of_deactive_posts = Post.objects.filter(admin_id=self.admin_id, status='deactive').count()
+        numbers_of_active_posts = Post.objects.filter(admin_id=self.admin_id, status='Đang hoạt động').count()
+        numbers_of_deactive_posts = Post.objects.filter(admin_id=self.admin_id, status='Vô hiệu hóa').count()
         numbers_of_users = User.objects.all().count()
         numbers_of_admins = Admin.objects.all().count()
         numbers_of_comments = Comment.objects.filter(admin_id=self.admin_id).count()
@@ -402,13 +402,13 @@ class AdminAddPostView(AdminViews):
         if form.is_valid():
             post = form.save(commit=False)
             post.admin = self.admin
-            post.status = 'active' if 'publish' in request.POST else 'deactive'
+            post.status = 'Đang hoạt động' if 'publish' in request.POST else 'Vô hiệu hóa'
             post.content = form.cleaned_data['content'] 
             post.save()
-            messages.success(request, 'Post published!' if post.status == 'active' else 'Draft saved!')
+            messages.success(request, 'Bài viết đã được xuất bản!' if post.status == 'Đang hoạt động' else 'Bản nháp đã được lưu!')
             return redirect('add_post')
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Vui lòng sửa lỗi bên dưới.')
             print(form.errors)
         
         context = {
@@ -417,36 +417,3 @@ class AdminAddPostView(AdminViews):
             'form': form
         }
         return render(request, self.template_name, context)
-    
-    
-class AdminRegisterView(AdminViews):
-    """Đăng ký""" 
-    def get(self, request):
-        return render(request, 'admin/register_admin.html')
-
-    def post(self, request):
-        message = ''
-        if request.method == 'POST':
-            name, password, confirm_password = (
-                request.POST.get('name'),
-                request.POST.get('pass'),
-                request.POST.get('cpass'),
-            )
-            
-            if Admin.objects.filter(name=name).exists():
-                message = 'Username already exists!'
-            else:
-                if password != confirm_password:
-                    message = 'Confirm password not matched!'
-                else:
-                    hashed_password = hashlib.sha1(password.encode()).hexdigest()
-                    request.session['name'] = name
-                    request.session['password'] = hashed_password
-                    
-                    Admin.objects.create(name=name, password=hashed_password)
-                    del request.session['name']
-                    del request.session['password']
-
-                    return redirect('admin_login')
-
-        return render(request, 'admin/register_admin.html', {'message': message if 'message' in locals() else ''})

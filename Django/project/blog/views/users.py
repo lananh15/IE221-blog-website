@@ -273,7 +273,7 @@ class UserLikesView(UserViews):
             likes = self.like_handler.get_user_likes()
             if likes.exists():
                 post_ids = likes.values_list('post_id', flat=True)
-                posts = Post.objects.filter(id__in=post_ids, status='active').annotate(
+                posts = Post.objects.filter(id__in=post_ids, status='Đang hoạt động').annotate(
                     total_likes=Count('like'),
                     total_comments=Count('comment')
                 )
@@ -293,7 +293,7 @@ class UserLikesView(UserViews):
 class UserHomeView(UserViews):
     """Load trang Home"""
     def get(self, request):
-        posts = Post.objects.filter(status='active')[:4]
+        posts = Post.objects.filter(status='Đang hoạt động')[:4]
 
         post_data = list(map(lambda post: {
             'post': post,
@@ -383,7 +383,7 @@ class UserLoadAuthorPosts(UserViews):
     """Hiển thị các bài post của tác giả tương ứng"""
     def get(self, request, **kwargs):
         author = kwargs.get('author')
-        posts = Post.objects.filter(name=author, status='active')
+        posts = Post.objects.filter(name=author, status='Đang hoạt động')
 
         post_data = list(map(lambda post: {
             'total_comments': self.comment_handler.get_post_total_comments(post),
@@ -409,7 +409,7 @@ class UserLoadAuthors(UserViews):
 
         author_stats = list(map(lambda author: {
             'name': author.name,
-            'total_posts': Post.objects.filter(admin_id=author.id, status='active').count(),
+            'total_posts': Post.objects.filter(admin_id=author.id, status='Đang hoạt động').count(),
             'total_likes': self.like_handler.get_admin_likes(admin_id=author.id).count(),
             'total_comments': self.comment_handler.get_admin_comments(admin_id=author.id).count(),
         }, authors))

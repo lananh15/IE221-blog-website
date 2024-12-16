@@ -16,7 +16,7 @@ class Post(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='python')  # Sử dụng choices cho category
     image = models.ImageField(upload_to='uploaded_img/', null=True, blank=True)  # Lưu ảnh vào thư mục 'uploaded_img'
     date = models.DateTimeField(auto_now_add=True)  # Thời gian tạo tự động
-    status = models.CharField(max_length=10)  # Trạng thái bài viết (ví dụ: 'active' hoặc 'inactive')
+    status = models.CharField(max_length=50)  # Trạng thái bài viết (ví dụ: 'active' hoặc 'inactive')
 
     class Meta:
         db_table = 'posts'  # Tên bảng trong cơ sở dữ liệu

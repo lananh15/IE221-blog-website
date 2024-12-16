@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Profile update</title>
+   <title>Cập nhật hồ sơ</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -24,12 +24,12 @@
 
    <form action="" method="POST">
         {% csrf_token %}
-        <h3>update profile</h3>
+        <h3>Cập nhật hồ sơ</h3>
         <input type="text" name="name" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')" placeholder="{{ admin_name }}">
-        <input type="password" name="old_pass" maxlength="20" placeholder="Enter your old password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-        <input type="password" name="new_pass" maxlength="20" placeholder="Enter your new password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-        <input type="password" name="confirm_pass" maxlength="20" placeholder="Confirm your new password" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-        <input type="submit" value="update" name="submit" class="btn">
+        <input type="password" name="old_pass" maxlength="20" placeholder="Nhập mật khẩu hiện tại" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+        <input type="password" name="new_pass" maxlength="20" placeholder="Nhập mật khẩu mới" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+        <input type="password" name="confirm_pass" maxlength="20" placeholder="Nhập lại mật khẩu mới" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
+        <input type="submit" value="Cập nhật" name="submit" class="btn">
    </form>
 
 </section>

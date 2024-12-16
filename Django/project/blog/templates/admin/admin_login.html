@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Admin Login</title>
+   <title>Đăng nhập vào Admin</title>
 
    <!-- Font Awesome CDN link -->
     <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
@@ -29,11 +29,11 @@
       <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
       <br><br>
 
-      <label class="label-form">Username</label>
+      <label class="label-form">Tên đăng nhập</label>
       <input type="text" name="name" maxlength="20" required class="box" oninput="this.value = this.value.replace(/\s/g, '')">
-      <label class="label-form">Password</label>
+      <label class="label-form">Mật khẩu</label>
       <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="submit" value="Login" name="submit" class="btn">
+      <input type="submit" value="Đăng nhập" name="submit" class="btn">
    </form>
 </section>
 <!-- Admin login form section ends -->

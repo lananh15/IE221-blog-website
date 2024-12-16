@@ -34,7 +34,7 @@ class PostOfCategory(PostsViews):
     """Hiển thị tất cả bài viết thuộc category""" 
     def get(self, request, **kwargs):
         category_name = kwargs.get('category_name')
-        posts = Post.objects.filter(category=category_name, status='active')
+        posts = Post.objects.filter(category=category_name, status='Đang hoạt động')
         post_data = []
         if posts.exists():
             post_data = list(map(lambda post: {
@@ -54,7 +54,7 @@ class PostOfCategory(PostsViews):
 class PostLoadAllPost(PostsViews):    
     def get(self, request):
         """Hiển thị tất cả các bài viết"""
-        posts = Post.objects.filter(status='active')
+        posts = Post.objects.filter(status='Đang hoạt động')
 
         post_data = list(map(lambda post: {
             'total_comments': self.comment_handler.get_post_total_comments(post),
@@ -75,7 +75,7 @@ class PostViewPost(PostsViews):
     """Hiển thị bài viết có id = post_id"""
     def get(self, request, **kwargs):
         post_id = kwargs.get('post_id')
-        post = Post.objects.get(id=post_id, status='active')
+        post = Post.objects.get(id=post_id, status='Đang hoạt động')
 
         context = {
             'post': post,
@@ -93,7 +93,7 @@ class PostViewPost(PostsViews):
     def post(self, request, **kwargs):
         post_id = kwargs.get('post_id')
         message = ''
-        post = Post.objects.get(id=post_id, status='active')
+        post = Post.objects.get(id=post_id, status='Đang hoạt động')
         edit_comment = None
         if request.method == 'POST' and self.user_id:
             if 'add_comment' in request.POST:

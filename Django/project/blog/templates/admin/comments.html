@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Users accounts</title>
+   <title>Các bình luận</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -20,13 +20,13 @@
 
 <section class="comments">
 
-   <h1 class="heading">posts comments</h1>
+   <h1 class="heading">Các bình luận</h1>
    
-   <p class="comment-title">Post comments</p>
+   <p class="comment-title">Các bình luận</p>
    <div class="box-container">
     {% if comments %}
         {% for item in comments %}
-        <div class="post-title"> From : <span>{{ item.post.title }}</span> <a href="read_post.php?post_id=<?= $fetch_posts['id']; ?>" >view post</a></div>
+        <div class="post-title"> Từ : <span>{{ item.post.title }}</span> <a href="read_post.php?post_id=<?= $fetch_posts['id']; ?>" >Xem bài viết</a></div>
     <div class="box">
         <div class="user">
             <i class="fas fa-user"></i>
@@ -39,12 +39,12 @@
         <form action="" method="POST">
             {% csrf_token %}
             <input type="hidden" name="comment_id" value="{{ item.comment.id }}">
-            <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Delete this comment?');">Delete comment</button>
+            <button type="submit" class="inline-delete-btn" name="delete_comment" onclick="return confirm('Xóa bình luận này?');">Xóa bình luận</button>
         </form>
     </div>
     {% endfor %}
    {% else %}
-       <p class="empty">No comments added yet!</p>
+       <p class="empty">Chưa có bình luận nào được thêm!</p>
    {% endif %}
    </div>
 

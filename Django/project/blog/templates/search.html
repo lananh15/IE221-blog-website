@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -39,7 +39,7 @@
                               {{ item.post.admin.name }}
                           </a>
                       {% else %}
-                          <span>Unknown Author</span>
+                          <span>Tác giả không xác định</span>
                       {% endif %}
                       <div>{{ item.post.date }}</div>
                   </div>
@@ -51,7 +51,7 @@
               
               <div class="post-title">{{ item.post.title }}</div>
               <div class="post-content content-150">{{ item.post.content }}</div>
-              <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read More</a>
+              <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Đọc thêm</a>
               {% if item.post.category %}
                   <a href="{% url 'category' category_name=item.post.category %}" class="post-cat"> 
                       <i class="fas fa-tag"></i> 
@@ -71,7 +71,7 @@
               </div>
           </form>
       {% else %}
-          <p>Invalid post</p>
+          <p>Bài viết không hợp lệ</p>
       {% endif %}
   {% endfor %}
   

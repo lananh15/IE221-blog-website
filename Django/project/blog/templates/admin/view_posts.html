@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Posts</title>
+   <title>Các bài viết</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -32,7 +32,7 @@
          {% if item.post.image %}
             <img src="{{ item.post.image.url }}" class="image" alt="">
          {% endif %}
-         <div class="status" style="background-color:{% if item.post.status == 'active' %}limegreen; {% else %}coral;{% endif %}">{{ item.post.status }}</div>
+         <div class="status" style="background-color:{% if item.post.status == 'Đang hoạt động' %}limegreen; {% else %}coral;{% endif %}">{{ item.post.status }}</div>
             <div class="title">{{ item.post.title }}</div>
          <div class="posts-content">{{ item.post.content }}</div>
          <div class="icons">

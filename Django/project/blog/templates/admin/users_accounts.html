@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Users accounts</title>
+   <title>Các tài khoản người dùng</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -22,20 +22,20 @@
 
 <section class="accounts">
 
-   <h1 class="heading">users account</h1>
+   <h1 class="heading">Các tài khoản người dùng</h1>
 
    <div class="box-container">
     {% if users %}
         {% for item in users %}
             <div class="box">
                 <p> User ID : <span>{{ item.user.id }}</span> </p>
-                <p> Username : <span>{{ item.user.name }}</span> </p>
-                <p> Total comments : <span>{{ item.total_user_comments }}</span> </p>
-                <p> Total likes : <span>{{ item.total_user_likes }}</span> </p>
+                <p> Tên hiển thị : <span>{{ item.user.name }}</span> </p>
+                <p> Tổng số bình luận : <span>{{ item.total_user_comments }}</span> </p>
+                <p> Tổng số lượt thích : <span>{{ item.total_user_likes }}</span> </p>
             </div>
         {% endfor %}
    {% else %}
-        <p class="empty">No accounts available</p>
+        <p class="empty">Không có tài khoản nào</p>
    {% endif %}
 
    </div>
