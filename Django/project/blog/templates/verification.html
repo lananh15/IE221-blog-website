@@ -27,7 +27,7 @@
       {% endif %}
       <label class="label-form">Mã xác thực</label>
       <input type="text" name="otp" placeholder="Nhập mã xác thực của bạn..." class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')" autocomplete="off">
-      <input type="submit" value="Submit" name="submit" class="btn">
+      <input type="submit" value="Gửi" name="submit" class="btn">
       <p>Cần mã xác thực mới? <a href="{% url 'resend_otp' %}">Gửi lại</a></p>
 
     </form>
