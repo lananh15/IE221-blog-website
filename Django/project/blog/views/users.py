@@ -189,7 +189,6 @@ class UserLoginView(UserViews):
                 user = User.objects.get(email=email)
                 if check_password(password, user.password):
                     request.session['user_id'] = user.id
-                    print(self.user_id)
                     return redirect('home')
                 else:
                     message = 'Tên đăng nhập hoặc mật khẩu không đúng!'
@@ -333,7 +332,7 @@ class UserHomeView(UserViews):
             'author': (Admin.objects.filter(id=post.admin_id).first() or {}).name,
             'author_id': (Admin.objects.filter(id=post.admin_id).first() or {}).id,
         }, posts))
-        print(self.user_id)
+        
         context = {
             'user_name': self.user_name,
             'user_comments': self.comment_handler.get_user_comments().count(),
