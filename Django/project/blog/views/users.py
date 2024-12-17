@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from ..models import Admin, User, Post, Like, Comment
 from django.contrib.auth import logout
+from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from datetime import timedelta
@@ -46,6 +47,17 @@ class UserViews(BaseView):
                         <p>Regards,<br>PyBlog.</p>"""
         send_mail(subject, '', settings.EMAIL_HOST_USER, [email], html_message=message)
         request.session['otp_sent_time'] = timezone.now().isoformat()
+
+def google_login_callback(request):
+    html_content = """
+    <script>
+        if (window.opener) {
+            window.opener.location.href = '/';
+        }
+        window.close();
+    </script>
+    """
+    return HttpResponse(html_content)
     
 class UserVerification(UserViews):
     """Gửi mail chứa OTP xác thực"""
@@ -293,7 +305,7 @@ class UserHomeView(UserViews):
     """Load trang Home"""
     def get(self, request):
         posts = Post.objects.filter(status='Đang hoạt động')[:4]
-
+          
         post_data = list(map(lambda post: {
             'post': post,
             'total_comments': self.comment_handler.get_post_total_comments(post),

@@ -7,11 +7,8 @@
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Đăng nhập</title>
-
-   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
-   <!-- custom css file link  -->
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
    <style>
    .btn-google {
@@ -25,8 +22,7 @@
       text-decoration: none;
       font-size: 1.6rem;
       transition: background-color 0.3s ease, transform 0.2s ease;
-      border: 2px solid var(--grey-900); /* Viền màu xám */
-
+      border: 2px solid var(--grey-900);
    }
 
    .btn-google i {
@@ -35,7 +31,7 @@
    }
 
    .btn-google:hover {
-      background-color: var(--grey-900); /* Nền sáng hơn khi hover */
+      background-color: var(--grey-900);
       color: black;
    }
    </style>
@@ -43,22 +39,21 @@
 <body>
 
 <section class="form-container">
-
    <form action="" method="post">
       {% csrf_token %}
       <a href="{% url 'home' %}"><img src="{% static 'image/doraemon.webp' %}" style="width:17%"></a>
-      <a href="{% provider_login_url 'google' %}?next=/"
-         class="btn btn-google">
+      <a href="{% provider_login_url 'google' %}?next=/close-popup/"
+         class="btn btn-google" onclick="return openPopup(this.href, 'GoogleLogin', 800, 600);">
          <i class="fab fa-google"></i>
          Tiếp tục với Google
       </a>
-      
+
       <div class="divider">
          <span>HOẶC</span>
       </div>
 
       {% if message %}
-      <p class="error">{{ message }}</p>  <!-- Hiển thị thông báo lỗi nếu có -->
+      <p class="error">{{ message }}</p>
       {% endif %}
 
       <label class="label-form">Email</label>
@@ -69,11 +64,28 @@
       <input type="submit" value="Đăng nhập" name="submit" class="btn">
       <p>Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký</a></p>
    </form>
-
 </section>
 
-<!-- custom js file link  -->
 <script src="{% static 'js/script.js' %}"></script>
+<script>
+function openPopup(url, title, width, height) {
+   const left = (screen.width - width) / 2;
+   const top = (screen.height - height) / 2;
+
+   // Mở popup và giữ focus cho cửa sổ chính
+   const popup = window.open(url, title, `width=${width},height=${height},top=${top},left=${left}`);
+   
+   // Kiểm tra khi popup bị đóng
+   const checkPopupClosed = setInterval(function() {
+      if (popup.closed) {
+         window.location.href = '/';  // Điều hướng trang chính về Home
+         clearInterval(checkPopupClosed); // Dừng kiểm tra
+      }
+   }, 1000);  // Kiểm tra mỗi giây
+
+   return false;
+}
+</script>
 
 </body>
 </html>

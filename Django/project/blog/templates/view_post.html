@@ -25,8 +25,8 @@
       {% csrf_token %}
       <input type="hidden" name="edit_comment_id" value="{{ comment_id }}">
       <textarea name="comment_edit_box" required cols="30" rows="10" placeholder="Vui lòng nhập bình luận của bạn">{{ edit_comment.comment }}</textarea>
-      <button type="submit" class="inline-btn" name="edit_comment">Edit comment</button>
-      <div class="inline-option-btn" onclick="window.location.href = '{% url 'view_post' post_id=post.id %}';">Cancel</div>
+      <button type="submit" class="inline-btn" name="edit_comment">Chỉnh sửa bình luận</button>
+      <div class="inline-option-btn" onclick="window.location.href = '{% url 'view_post' post_id=post.id %}';">Hủy</div>
    </form>
    </section>
    {% endif %}
@@ -76,7 +76,7 @@
       <input type="hidden" name="user_name" value="{{ user_name }}">
       <p class="user"><i class="fas fa-user"></i><a href="{% url 'update_profile' %}">{{ user_name }}</a></p>
       <textarea name="comment" maxlength="1000" class="comment-box" cols="30" rows="10" placeholder="Viết bình luận..." required></textarea>
-      <input type="submit" value="add comment" class="inline-btn" name="add_comment">
+      <input type="submit" value="Thêm bình luận" class="inline-btn" name="add_comment">
    </form>
    {% else %}
    <div class="add-comment">
