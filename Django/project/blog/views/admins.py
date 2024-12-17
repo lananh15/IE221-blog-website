@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib import messages
-from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
 from ..models import Admin, User, Post, Like, Comment
@@ -12,12 +10,12 @@ from .comments import CommentViews
 from .likes import LikeViews
 from django.views import View
 
-import hashlib
 import os
 
 class AdminViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.admin_id = request.session.get('admin_id', None)
+        self.user_id = request.session.get('user_id', None)
         self.initialize_handlers()
         response = super().dispatch(request, *args, **kwargs)
 
@@ -41,9 +39,13 @@ class AdminViews(BaseView):
             return None
         return admin_name
     
-    def get_posts_by_status(self, status):
-        select_posts = Post.objects.filter(status=status)
-
+    def get_posts(self, status=None):
+        """Lấy tất cả các bài viết của admin theo trạng thái nếu có"""
+        if status:  # Nếu có status, lọc theo trạng thái
+            select_posts = Post.objects.filter(admin_id=self.admin_id, status=status)
+        else:  # Nếu không có status, lấy tất cả bài viết của admin
+            select_posts = Post.objects.filter(admin_id=self.admin_id)
+        self.initialize_handlers()
         post_data = list(map(lambda post: {
             'post': post,
             'total_post_comments': self.comment_handler.get_post_total_comments(post),
@@ -52,15 +54,39 @@ class AdminViews(BaseView):
 
         return post_data
     
+    def delete_post(self, request, **kwargs):
+        """Cho phép admin xóa bài viết"""
+        message = ''
+        status = kwargs.get('status', None)
+        if 'delete' in request.POST:
+            p_id = request.POST.get('post_id', '').strip()
+            post = Post.objects.get(id=p_id)
 
+            if post.image != '':
+                image_path = post.image.path
+                if os.path.isfile(image_path):
+                    os.remove(image_path)
+
+            post.delete()
+            Comment.objects.filter(post_id=p_id).delete()
+            message = 'Bài viết đã được xóa thành công!'
+        context = {
+            'admin_name': self.admin_name,
+            'admin_id': self.admin_id,
+            'posts': self.get_posts(status=status),
+            'message': message,
+        }
+        return render(request, 'admin/view_posts.html', context)
+    
 class AdminLoginView(AdminViews):
-    """Hiển thị trang login phía admin"""
     def get(self, request):
+        """Hiển thị trang login phía admin"""
         if request.session.get('admin_id'):
             return redirect('dashboard')
         return render(request, 'admin/admin_login.html')
 
     def post(self, request):
+        """Xử lý form đăng nhập vào admin"""
         name = request.POST.get('name')
         password = request.POST.get('pass')
 
@@ -70,15 +96,15 @@ class AdminLoginView(AdminViews):
                 request.session['admin_id'] = admin.id
                 return redirect('dashboard')
             else:
-                message = 'Incorrect username or password!'
+                message = 'Tên đăng nhập hoặc mật khẩu không đúng'
         except Admin.DoesNotExist:
-            message = 'Incorrect username or password!'
+            message = 'Tên đăng nhập hoặc mật khẩu không đúng!'
 
         return render(request, 'admin/admin_login.html', {'message': message})
 
 class AdminDashboardView(AdminViews, View):
-    """Hiển thị trang Dashboard phía admin"""
     def get(self, request):
+        """Hiển thị trang Dashboard phía admin"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -106,49 +132,52 @@ class AdminDashboardView(AdminViews, View):
         return render(request, 'admin/dashboard.html', context)
 
 class AdminLogoutView(AdminViews):
-    """Xử lý logout cho admin"""
     def get(self, request):
+        """Xử lý logout cho admin"""
         logout(request)
         return redirect('admin_login')
 
 class AdminUpdateProfileView(AdminViews):
-    """Xử lý trang update profile phía admin"""
     def get(self, request, **kwargs):
+        """Hiển thị trang update profile cho admin"""
         admin_name = kwargs.get('admin_name')
         return render(request, 'admin/update_profile.html', {'admin_name': admin_name, 'admin_id': self.admin_id})
 
+    def update_password(self, old_pass, new_pass, confirm_pass):
+        if not check_password(old_pass, self.admin.password):
+            return 'Mật khẩu hiện tại không đúng!'
+        elif new_pass != confirm_pass:
+            return 'Mật khẩu nhập lại không chính xác!'
+        elif not new_pass:
+            return 'Vui lòng nhập mật khẩu mới!'
+        else:
+            self.admin.password = make_password(new_pass)
+            self.admin.save()
+            return 'Mật khẩu được cập nhật thành công!'
+        
     def post(self, request, **kwargs):
-        admin_name = kwargs.get('admin_name')
+        """Xử lý form update profile cho admin"""
         message = []
-        admin_id = self.admin_id if admin_name else None
-        if 'submit' in request.POST:
+
+        if request.method == 'POST' and 'submit' in request.POST:
             name = request.POST.get('name').strip()
             if name:
                 if Admin.objects.filter(name=name).exists():
-                    message.append('username already taken!')
+                    message.append('Tên đăng nhập này đã được dùng!')
                 else:
-                    Admin.objects.filter(id=admin_id).update(name=name)
+                    self.admin.name = name
+                    self.admin.save()
 
             old_pass = request.POST.get('old_pass', '').strip()
             new_pass = request.POST.get('new_pass', '').strip()
             confirm_pass = request.POST.get('confirm_pass', '').strip()
 
             if old_pass:
-                if hashlib.sha1(old_pass.encode()).hexdigest() != self.admin.password:
-                    message = 'Old password not matched!'
-                elif new_pass != confirm_pass:
-                    message = 'Confirm password not matched!'
-                else:
-                    if new_pass:
-                        self.admin.password = hashlib.sha1(new_pass.encode()).hexdigest()
-                        self.admin.save()
-                        message = 'Password updated successfully!'
-                    else:
-                        message = 'Please enter a new password!'
+                message = self.update_password(old_pass, new_pass, confirm_pass)
 
         context = {
-            'admin_name': admin_name,
-            'admin_id': admin_id,
+            'admin_name': self.admin.name,
+            'admin_id': self.admin_id,
             'message': message,
         }
 
@@ -156,80 +185,37 @@ class AdminUpdateProfileView(AdminViews):
 
 class AdminViewPostView(AdminViews):
     def get(self, request):
-        """Xem tất cả các bài viết đã đăng của admin hiện tại login"""
+        """Xem tất cả các bài viết đã đăng của admin hiện tại đã login"""
         if self.admin_id is None:
             return redirect('admin_login')
         
-        select_posts = Post.objects.filter(admin_id=self.admin_id)
-
-        post_data = list(map(lambda post: {
-            'post': post,
-            'total_post_comments': self.comment_handler.get_post_total_comments(post),
-            'total_post_likes': self.like_handler.get_post_total_likes(post),
-        }, select_posts))
-
         context = {
             'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'posts': post_data,
+            'posts': self.get_posts(),
         }
         return render(request, 'admin/view_posts.html', context)
 
     def post(self, request):
-        message = ''
-        if 'delete' in request.POST:
-            p_id = request.POST.get('post_id', '').strip()
-            post = Post.objects.get(id=p_id)
-
-            if post.image != '':
-                image_path = post.image.path
-                if os.path.isfile(image_path):
-                    os.remove(image_path)
-
-            post.delete()
-            Comment.objects.filter(post_id=p_id).delete()
-            message = 'Post deleted successfully!'
-        context = {
-            'admin_name': self.admin_name,
-            'admin_id': self.admin_id,
-            'message': message,
-        }
-        return render(request, 'admin/view_posts.html', context)
+        """Cho phép admin xóa bài viết của mình"""
+        return self.delete_post(request)
 
 class AdminViewActivePostView(AdminViews):    
     def get(self, request):
-        """Xem tất cả các bài viết đang hoạt động"""
+        """Xem tất cả các bài viết đang hoạt động có trên website"""
         if self.admin_id is None:
             return redirect('admin_login')
         
         context = {
             'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'posts': self.get_posts_by_status(status='Đang hoạt động'),
+            'posts': self.get_posts(status='Đang hoạt động'),
         }
         return render(request, 'admin/view_posts.html', context)
 
     def post(self, request):
-        message = ''
-        if 'delete' in request.POST:
-            p_id = request.POST.get('post_id', '').strip()
-            post = Post.objects.get(id=p_id)
-
-            if post.image != '':
-                image_path = post.image.path
-                if os.path.isfile(image_path):
-                    os.remove(image_path)
-
-            post.delete()
-            Comment.objects.filter(post_id=p_id).delete()
-            message = 'Bài viết đã được xóa thành công!'
-        context = {
-            'admin_name': self.admin_name,
-            'admin_id': self.admin_id,
-            'posts': self.get_active_posts(),
-            'message': message,
-        }
-        return render(request, 'admin/view_posts.html', context)
+        """Cho phép admin xóa bài viết đang hoạt động"""
+        return self.delete_post(request, status="Đang hoạt động")
 
 class AdminViewDeactivePostView(AdminViews):
     def get(self, request):
@@ -240,37 +226,19 @@ class AdminViewDeactivePostView(AdminViews):
         context = {
             'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'posts': self.get_posts_by_status(status='Ngừng hoạt động'),
+            'posts': self.get_posts(status='Ngừng hoạt động'),
         }
         return render(request, 'admin/view_posts.html', context)
 
     def post(self, request):
-        message = ''
-        if 'delete' in request.POST:
-            p_id = request.POST.get('post_id', '').strip()
-            post = Post.objects.get(id=p_id)
-
-            if post.image != '':
-                image_path = post.image.path
-                if os.path.isfile(image_path):
-                    os.remove(image_path)
-
-            post.delete()
-            Comment.objects.filter(post_id=p_id).delete()
-            message = 'Bài viết đã được xóa thành công!'
-        context = {
-            'admin_name': self.admin_name,
-            'admin_id': self.admin_id,
-            'message': message,
-        }
-        return render(request, 'admin/view_posts.html', context)
-
+        """Cho phép admin xóa bài viết ngừng hoạt động"""
+        return self.delete_post(request, status="Ngừng hoạt động")
 
 # Hiển thị chi tiết các bài đăng của admin khi bấm vào những bài đăng, lấy id đối chiếuchiếu
 #tại view_post.html
 class AdminReadPostView(AdminViews):
-    """Xem chi tiết bài viết và các bình luận liên quan"""
     def get(self, request, post_id):
+        """Xem chi tiết bài viết và các bình luận liên quan"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -281,7 +249,6 @@ class AdminReadPostView(AdminViews):
             return redirect('admin_posts')  # Quay lại danh sách bài viết nếu bài viết không tồn tại
 
         comments = Comment.objects.filter(post_id=post.id).order_by('-date')
-
 
         # Hiện tổng lượt like và comment
         post.total_likes = self.like_handler.get_post_total_likes(post)
@@ -295,9 +262,8 @@ class AdminReadPostView(AdminViews):
         }
         return render(request, 'admin/read_post.html', context)
     
-
-    #Cho phép xóa cmt tại chỗ xem chi tiết bài viết
     def post(self, request, post_id):
+        """Cho phép xóa cmt tại chỗ xem chi tiết bài viết"""
         if 'delete_comment' in request.POST:
             comment_id = request.POST.get('comment_id', '')
             try:
@@ -307,7 +273,6 @@ class AdminReadPostView(AdminViews):
                 pass 
 
         return redirect('admin_read_post', post_id=post_id)
-
 
     def post(self, request):
         if 'post_id' in request.POST:
@@ -323,8 +288,8 @@ class AdminReadPostView(AdminViews):
     
 
 class AdminEditPostView(AdminViews):
-    """Chỉnh sửa bài viết"""
     def get(self, request, post_id):
+        """Hiển thị trang chỉnh sửa bài viết"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -343,6 +308,7 @@ class AdminEditPostView(AdminViews):
         return render(request, 'admin/edit_post.html', context)
 
     def post(self, request, post_id):
+        """Xử lý form chỉnh sửa bài viết"""
         try:
             post = Post.objects.get(id=post_id, admin_id=self.admin_id)
         except Post.DoesNotExist:
@@ -363,8 +329,8 @@ class AdminEditPostView(AdminViews):
         return render(request, 'admin/edit_post.html', context)
 
 class AdminGetUsersView(AdminViews):
-    """Lấy thông tin tất cả user đang có trên web"""
     def get(self, request):
+        """Hiển thị thông tin tất cả user đang có trên web"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -385,8 +351,8 @@ class AdminGetUsersView(AdminViews):
         return render(request, 'admin/users_accounts.html', context)
 
 class AdminGetAdminsView(AdminViews):
-    """Lấy thông tin tất cả các admin hiện tại có trên web"""
     def get(self, request):
+        """Hiển thị thông tin tất cả các admin hiện tại có trên web"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -420,8 +386,8 @@ class AdminGetAdminsView(AdminViews):
         return render(request, 'admin/admin_accounts.html', context)
 
 class AdminGetCommentsView(AdminViews):
-    """Xem tất cả comment có liên quan đến admin hiện tại đã login"""
     def get(self, request):
+        """Xem tất cả comment của admin đã login nhận được"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -442,11 +408,12 @@ class AdminGetCommentsView(AdminViews):
         return render(request, 'admin/comments.html', context)
 
     def post(self, request):
+        """Cho phép xóa bình luận admin nhận được"""
         message = ''
         if 'delete_comment' in request.POST:
             comment_id = request.POST.get('comment_id', '')
             if self.comment_handler.delete_comment(comment_id=comment_id, admin_id=self.admin_id):
-                message = "Comment deleted successfully!"
+                message = "Bình luận được xóa thành công!"
 
         context = {
             'admin_name': self.admin_name,
@@ -457,10 +424,8 @@ class AdminGetCommentsView(AdminViews):
         return render(request, 'admin/comments.html', context)
     
 class AdminAddPostView(AdminViews):
-    template_name = 'admin/add_post.html'
-    
     def get(self, request):
-        # Sử dụng get_admin_context() để kiểm tra authentication
+        """Hiển thị trang chỉnh sửa bài viết"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -471,9 +436,10 @@ class AdminAddPostView(AdminViews):
             'admin_id': self.admin_id,
             'form': form
         }
-        return render(request, self.template_name, context)
+        return render(request, 'admin/add_post.html', context)
     
     def post(self, request):
+        """Xử lý form chỉnh sửa bài viết"""
         admin_name = self.get_admin_context()
         if admin_name is None:
             return redirect('admin_login')
@@ -494,6 +460,6 @@ class AdminAddPostView(AdminViews):
         context = {
             'admin_name': self.admin_name,
             'admin_id': self.admin_id,
-            'form': form
+            'form': form,
         }
-        return render(request, self.template_name, context)
+        return render(request, 'admin/add_post.html', context)

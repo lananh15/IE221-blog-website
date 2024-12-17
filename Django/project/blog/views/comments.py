@@ -1,5 +1,5 @@
 from django.utils import timezone
-from ..models import Like, Comment
+from ..models import Comment
 
 class CommentViews:
     def __init__(self, **kwargs):

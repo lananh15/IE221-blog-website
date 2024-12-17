@@ -1,15 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Admin, User, Post, Like, Comment
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
+from django.shortcuts import render, redirect
+from ..models import Post, Comment
 
 from .base import BaseView
 from .comments import CommentViews
 from .likes import LikeViews
+from .users import UserViews
 
 class PostsViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.session.get('user_id', None)
+        self.admin_id = request.session.get('admin_id', None)
         self.initialize_handlers()
         response = super().dispatch(request, *args, **kwargs)
 
@@ -52,7 +52,7 @@ class PostOfCategory(PostsViews):
 
 class PostLoadAllPost(PostsViews):    
     def get(self, request):
-        """Hiển thị tất cả các bài viết"""
+        """Hiển thị tất cả các bài viết đang hoạt động cho user"""
         posts = Post.objects.filter(status='Đang hoạt động')
 
         post_data = list(map(lambda post: {
@@ -69,10 +69,32 @@ class PostLoadAllPost(PostsViews):
         }
         
         return render(request, 'posts.html', context)
+    
+class UserLoadAuthorPosts(UserViews):
+    """Hiển thị các bài post của tác giả tương ứng"""
+    def get(self, request, **kwargs):
+        author = kwargs.get('author')
+        posts = Post.objects.filter(name=author, status='Đang hoạt động')
+
+        post_data = list(map(lambda post: {
+            'total_comments': self.comment_handler.get_post_total_comments(post),
+            'total_likes': self.like_handler.get_post_total_likes(post),
+            'is_liked': self.like_handler.user_liked_post(post.id),
+            'post': post
+        }, posts))
+
+        context = {
+            'posts': post_data,
+            'author': author,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }  
+
+        return render(request, 'author_posts.html', context)
 
 class PostViewPost(PostsViews):
     def get(self, request, **kwargs):
-        """Hiển thị 1 bài viết có id = post_id"""
+        """Hiển thị 1 bài viết có id = post_id cho user"""
         post_id = kwargs.get('post_id')
         post = Post.objects.get(id=post_id)
         context = {}
@@ -91,7 +113,7 @@ class PostViewPost(PostsViews):
 
     
     def post(self, request, **kwargs):
-        """User thêm, xóa, sửa comment"""
+        """User thêm, xóa, sửa comment trong post"""
         post_id = kwargs.get('post_id')
         message = ''
         post = Post.objects.get(id=post_id, status='Đang hoạt động')

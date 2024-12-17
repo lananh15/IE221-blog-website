@@ -1,10 +1,9 @@
 from django.urls import path, include
-from .views.admins import AdminEditPostView, AdminLoginView, AdminDashboardView, AdminReadPostView, AdminUpdateProfileView, AdminViewPostView, AdminGetUsersView, AdminGetCommentsView, AdminGetAdminsView, AdminLogoutView, AdminAddPostView, AdminViewActivePostView, AdminViewDeactivePostView
-# from .views.users import UserHeaderView, UserContactView, UserAboutView, UserLogoutView, UserLoginView, UserRegisterView, UserHomeView, UserUpdateProfileView, UserLikesView, UserCommentsView, UserLoadAuthors, UserLoadAuthorPosts, UserLikedPost, UserVerification, UserResendOTP, UserForgetPassword, google_login_callback
-from .views.posts import PostAllCategory, PostOfCategory, PostLoadAllPost, PostViewPost
-from .views.search import SearchPostView
-
+from .views.admins import *
+from .views.posts import *
+from .views.search import *
 from .views.users import *
+
 urlpatterns = [
     # User
     path('close-popup/', google_login_callback, name='close_popup'),

@@ -35,7 +35,7 @@
 
    <div class="box">
       <h3>{{ numbers_of_posts }}</h3>
-      <p>Bài viết đã được thêm</p>
+      <p>Bài viết bạn đã thêm</p>
       <a href="{% url 'add_post' %}" class="btn">Thêm bài viết mới</a>
    </div>
 
@@ -65,13 +65,13 @@
    
    <div class="box">
       <h3>{{ numbers_of_comments }}</h3>
-      <p>Các bình luận đã được thêm</p>
+      <p>Số bình luận bạn nhận được</p>
       <a href="{% url 'comments' %}" class="btn">Xem bình luận</a>
    </div>
 
    <div class="box">
       <h3>{{ numbers_of_likes }}</h3>
-      <p>Tổng lượt thích</p>
+      <p>Số lượt thích bạn nhận được</p>
       <a href="{% url 'admin_view_post' %}" class="btn">Xem bài viết</a>
    </div>
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from ..models import Admin, User, Post, Like, Comment
+from ..models import Admin, User, Post, Like
 from django.contrib.auth import logout
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
@@ -8,8 +8,6 @@ from datetime import timedelta
 from django.db.models import Count
 
 from .base import BaseView
-from .comments import CommentViews
-from .likes import LikeViews
 
 import random
 import string
@@ -25,6 +23,8 @@ class UserViews(BaseView):
         return response
     
     def initialize_handlers(self):
+        from .comments import CommentViews
+        from .likes import LikeViews
         """Khởi tạo comment_handler và like_handler"""
         self.comment_handler = CommentViews(user_id=self.user_id)
         self.like_handler = LikeViews(user_id=self.user_id)
@@ -38,13 +38,13 @@ class UserViews(BaseView):
     @staticmethod
     def send_otp_email(request, email, otp_code):
         """Gửi email chứa mã xác thực với subject và nội dung"""
-        subject = '[PyBlog] Verification Code'
-        message = f"""<h3 style='display:block;text-align:center;font-size:18px;'> Verify </h3>
-                        <p>Your verification code is:
+        subject = '[PyBlog] Mã Xác Thực'
+        message = f"""<h3 style='display:block;text-align:center;font-size:18px;'> Xác thực </h3>
+                        <p>Mã xác thực của bạn là:
                             <strong style='display:block;text-align:center;font-size:25px;'>{otp_code}</strong>
                         </p>
-                        <p>This verification code is only valid for 3 minutes. Please use this code to complete the process.</p>
-                        <p>Regards,<br>PyBlog.</p>"""
+                        <p>Mã xác thực này chỉ có hiệu lực trong vòng 3 phút. Vui lòng nhập mã xác thực này để hoàn thành quy trình.</p>
+                        <p>Thân mến,<br>PyBlog.</p>"""
         send_mail(subject, '', settings.EMAIL_HOST_USER, [email], html_message=message)
         request.session['otp_sent_time'] = timezone.now().isoformat()
 
@@ -84,10 +84,10 @@ class UserVerification(UserViews):
                 if time_diff > timedelta(minutes=3):
                     del request.session['otp']
                     del request.session['otp_sent_time']
-                    return render(request, 'verification.html', {'message': 'The verification code has expired. Please click "Resend" below.'})
+                    return render(request, 'verification.html', {'message': 'Mã xác thực đã hết hiệu lực. Vui lòng nhấn "Gửi lại" bên dưới.'})
                 
                 if otp_code_input != request.session.get('otp'):
-                    return render(request, 'verification.html', {'message': 'The verification code is invalid.'})
+                    return render(request, 'verification.html', {'message': 'Mã xác thực không hợp lệ.'})
                 else:
                     if email and password:
                         User.objects.create(name=name, email=email, password=password)
@@ -103,13 +103,13 @@ class UserVerification(UserViews):
                             del request.session['email']
                             del request.session['npass']
                         else:
-                            return render(request, 'verification.html', {'message': 'User not found.'})
+                            return render(request, 'verification.html', {'message': 'Không tìm thấy người dùng.'})
                     return redirect('login')
             
         else:
-            return render(request, 'verification.html', {'message': 'Please click "Resend" below.'})
+            return render(request, 'verification.html', {'message': 'Vui lòng nhấn "Gửi lại" bên dưới.'})
 
-        return render(request, 'verification.html', {'message': 'Session data not found. Please try again.'})
+        return render(request, 'verification.html', {'message': 'Không tìm thấy dữ liệu phiên. Vui lòng thử lại.'})
 
 class UserResendOTP(UserViews):
     """Gửi lại mã xác thực cho người dùng"""
@@ -142,7 +142,7 @@ class UserForgetPassword(UserViews):
             )
 
             if npass != cpass:
-                message = 'Confirm password not matched!'
+                message = 'Mật khẩu nhập lại không khớp!'
             
             else:
                 hashed_password = make_password(npass)
@@ -192,9 +192,9 @@ class UserLoginView(UserViews):
                     print(self.user_id)
                     return redirect('home')
                 else:
-                    message = 'Incorrect username or password!'
+                    message = 'Tên đăng nhập hoặc mật khẩu không đúng!'
             except User.DoesNotExist:
-                message = 'Incorrect username or password!'
+                message = 'Tên đăng nhập hoặc mật khẩu không đúng!'
 
         return render(request, 'login.html', {'message': message if 'message' in locals() else ''})
 
@@ -214,10 +214,10 @@ class UserRegisterView(UserViews):
             )
             
             if User.objects.filter(email=email).exists():
-                message = 'Email already exists!'
+                message = 'Email đã được đăng ký cho tài khoản khác!'
             else:
                 if password != confirm_password:
-                    message = 'Confirm password not matched!'
+                    message = 'Mật khẩu nhập lại không chính xác!'
                 else:
                     hashed_password = make_password(password)
                     request.session['name'] = name
@@ -235,15 +235,15 @@ class UserUpdateProfileView(UserViews):
 
     def update_password(self, old_pass, new_pass, confirm_pass):
         if not check_password(old_pass, self.user.password):
-            return 'Old password not matched!'
+            return 'Mật khẩu hiện tại không đúng!'
         elif new_pass != confirm_pass:
-            return 'Confirm password not matched!'
+            return 'Mật khẩu nhập lại không chính xác!'
         elif not new_pass:
-            return 'Please enter a new password!'
+            return 'Vui lòng nhập mật khẩu mới!'
         else:
             self.user.password = make_password(new_pass)
             self.user.save()
-            return 'Password updated successfully!'
+            return 'Mật khẩu được cập nhật thành công!'
 
     def post(self, request):
         message = ''
@@ -255,15 +255,14 @@ class UserUpdateProfileView(UserViews):
             self.user.save()
 
             if email and User.objects.filter(email=email).exclude(id=self.user_id).exists():
-                    message = 'Email already taken!'
-            else:
-                if email:
+                    message = 'Email đã được đăng ký!'
+            elif email:
                     self.user.email = email
                     self.user.save()
 
-            old_pass = request.POST.get('old_pass', '')
-            new_pass = request.POST.get('new_pass', '')
-            confirm_pass = request.POST.get('confirm_pass', '')
+            old_pass = request.POST.get('old_pass', '').strip()
+            new_pass = request.POST.get('new_pass', '').strip()
+            confirm_pass = request.POST.get('confirm_pass', '').strip()
             
             if old_pass:
                 message = self.update_password(old_pass, new_pass, confirm_pass)
@@ -301,10 +300,30 @@ class UserLikesView(UserViews):
 
         return render(request, 'user_likes.html', context)
 
+class UserLoadAuthors(UserViews):
+    """Hiển thị các tác giả (là admin) cho user"""
+    def get(self, request):
+        authors = Admin.objects.all()
+
+        author_stats = list(map(lambda author: {
+            'name': author.name,
+            'total_posts': Post.objects.filter(admin_id=author.id, status='Đang hoạt động').count(),
+            'total_likes': self.like_handler.get_admin_likes(admin_id=author.id).count(),
+            'total_comments': self.comment_handler.get_admin_comments(admin_id=author.id).count(),
+        }, authors))
+
+        context = {
+            'author_stats': author_stats,
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+        }
+        
+        return render(request, 'authors.html', context)
+
 class UserHomeView(UserViews):
     """Load trang Home"""
     def get(self, request):
-        posts = Post.objects.filter(status='Đang hoạt động')[:4]
+        posts = Post.objects.filter(status='Đang hoạt động').order_by('-date')[:4]
           
         post_data = list(map(lambda post: {
             'post': post,
@@ -350,15 +369,15 @@ class UserCommentsView(UserViews):
                 comment_edit_box = request.POST.get('comment_edit_box')
 
                 if self.comment_handler.comment_exists(comment_edit_box, edit_comment_id):
-                    message = "Comment already added!"
+                    message = "Bình luận đã tồn tại!"
                 else:
                     self.comment_handler.update_comment(edit_comment_id, comment_edit_box)
-                    message = "Your comment edited successfully!"
+                    message = "Chỉnh sửa bình luận thành công!"
 
             elif 'delete_comment' in request.POST:
                 delete_comment_id = request.POST.get('comment_id')
                 if self.comment_handler.delete_comment(comment_id=delete_comment_id, user_id=self.user_id):
-                    message = "Comment deleted successfully!"
+                    message = "Bình luận được xóa thành công!"
 
             elif 'open_edit_box' in request.POST:
                 comment_id = request.POST.get('comment_id')
@@ -374,7 +393,7 @@ class UserCommentsView(UserViews):
         }
 
         return render(request, 'user_comments.html', context)
-
+    
 class UserLikedPost(UserViews):
     """Like hoặc Unlike bài post"""
     def post(self, request, **kwargs):
@@ -389,46 +408,3 @@ class UserLikedPost(UserViews):
             self.like_handler.like_post(self.user, admin, post)
 
         return redirect(request.META.get('HTTP_REFERER'))
-
-class UserLoadAuthorPosts(UserViews):
-    """Hiển thị các bài post của tác giả tương ứng"""
-    def get(self, request, **kwargs):
-        author = kwargs.get('author')
-        posts = Post.objects.filter(name=author, status='Đang hoạt động')
-
-        post_data = list(map(lambda post: {
-            'total_comments': self.comment_handler.get_post_total_comments(post),
-            'total_likes': self.like_handler.get_post_total_likes(post),
-            'is_liked': self.like_handler.user_liked_post(post.id),
-            'post': post
-        }, posts))
-
-        context = {
-            'posts': post_data,
-            'author': author,
-            'user_id': self.user_id,
-            'user_name': self.user_name,
-        }  
-
-        return render(request, 'author_posts.html', context)
-    
-
-class UserLoadAuthors(UserViews):
-    """Hiển thị các tác giả (là admin)"""
-    def get(self, request):
-        authors = Admin.objects.all()
-
-        author_stats = list(map(lambda author: {
-            'name': author.name,
-            'total_posts': Post.objects.filter(admin_id=author.id, status='Đang hoạt động').count(),
-            'total_likes': self.like_handler.get_admin_likes(admin_id=author.id).count(),
-            'total_comments': self.comment_handler.get_admin_comments(admin_id=author.id).count(),
-        }, authors))
-
-        context = {
-            'author_stats': author_stats,
-            'user_id': self.user_id,
-            'user_name': self.user_name,
-        }
-        
-        return render(request, 'authors.html', context)
