@@ -75,7 +75,7 @@ class PostLoadAllPost(PostsViews):
             HttpResponse: Trả về trang HTML 'posts.html' với danh sách các bài viết đang hoạt động cùng với tổng số bình luận,
             lượt thích, và trạng thái "liked" của người dùng đối với mỗi bài viết
         """
-        posts = Post.objects.filter(status='Đang hoạt động')
+        posts = Post.objects.filter(status='Đang hoạt động').order_by('-date')
 
         post_data = list(map(lambda post: {
             'total_comments': self.comment_handler.get_post_total_comments(post),
