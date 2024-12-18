@@ -31,13 +31,27 @@ class UserViews(BaseView):
     
     @staticmethod
     def generate_otp(length=6):
-        """Tạo mã OTP ngẫu nhiên"""
+        """
+        Tạo mã OTP ngẫu nhiên chỉ bao gồm 6 chữ số
+        Input:
+            length (int, optional): Độ dài mã OTP cần tạo, mặc định là 6
+        Output:
+            str: Mã OTP ngẫu nhiên bao gồm các chữ số có độ dài tương ứng với tham số đầu vào
+        """
         otp = ''.join(random.choices(string.digits, k=length))
         return otp
     
     @staticmethod
     def send_otp_email(request, email, otp_code):
-        """Gửi email chứa mã xác thực với subject và nội dung"""
+        """
+        Gửi email chứa mã OTP xác thực với tiêu đề và nội dung được định dạng HTML
+        Input:
+            request (HttpRequest): Đối tượng request hiện tại để lưu thời gian gửi OTP
+            email (str): Địa chỉ email của người nhận mã OTP
+            otp_code (str): Mã OTP cần gửi
+        Output:
+            None
+        """
         subject = '[PyBlog] Mã Xác Thực'
         message = f"""<h3 style='display:block;text-align:center;font-size:18px;'> Xác thực </h3>
                         <p>Mã xác thực của bạn là:
@@ -49,6 +63,15 @@ class UserViews(BaseView):
         request.session['otp_sent_time'] = timezone.now().isoformat()
 
 def google_login_callback(request):
+    """
+    Xử lý callback sau khi người dùng đăng nhập thành công qua Google (popup)
+    Input:
+        request (HttpRequest): Yêu cầu HTTP chứa thông tin về phản hồi từ Google 
+                                sau khi người dùng đăng nhập thành công
+    Output:
+        HttpResponse: Trả về mã HTML chứa script JavaScript để đóng cửa sổ đăng nhập 
+                      và chuyển hướng trang chính của ứng dụng
+    """
     html_content = """
     <script>
         if (window.opener) {
@@ -60,8 +83,15 @@ def google_login_callback(request):
     return HttpResponse(html_content)
     
 class UserVerification(UserViews):
-    """Gửi mail chứa OTP xác thực"""
     def get(self, request):
+        """
+        Lấy OTP mới và gửi qua email để xác thực
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin phiên của người dùng
+        Output:
+            Render trang 'verification.html' để người dùng nhập mã
+            Lưu trữ OTP vào session và gửi email chứa mã xác thực
+        """
         email = request.session.get('email')
         otp = self.generate_otp()
         request.session['otp'] = otp
@@ -69,6 +99,14 @@ class UserVerification(UserViews):
         return render(request, 'verification.html', self.context)
     
     def post(self, request):
+        """
+        Xử lý việc xác thực OTP khi người dùng nhập hoặc chọn gửi lại mã
+        Input:
+            request: Đối tượng HttpRequest chứa mã OTP từ người dùng và các thông tin liên quan đến việc xác thực
+        Output:
+            Render trang 'verification.html' với thông báo lỗi nếu OTP không hợp lệ, hoặc chuyển hướng đến trang login nếu thành công
+            kiểm tra tính hợp lệ của OTP và thời gian hết hạn, sau đó thực hiện tạo tài khoản hoặc thay đổi mật khẩu cho người dùng
+        """
         name, email, password, npass = (
             request.session.get('name'),
             request.session.get('email'),
@@ -112,8 +150,14 @@ class UserVerification(UserViews):
         return render(request, 'verification.html', {'message': 'Không tìm thấy dữ liệu phiên. Vui lòng thử lại.'})
 
 class UserResendOTP(UserViews):
-    """Gửi lại mã xác thực cho người dùng"""
     def get(self, request):
+        """
+        Gửi lại mã OTP xác thực qua email cho người dùng
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin phiên của người dùng
+        Output:
+            Chuyển hướng đến trang xác thực hoặc trang đăng ký tùy thuộc vào sự tồn tại của email trong session
+        """
         email = request.session.get('email')
         if not email:
             return redirect('register')
@@ -128,11 +172,24 @@ class UserResendOTP(UserViews):
         return redirect('verification')
     
 class UserForgetPassword(UserViews):
-    """Người dùng quên mật khẩu, cài lại mật khẩu mới"""
     def get(self, request):
+        """
+        Hiển thị trang yêu cầu người dùng nhập email và mật khẩu mới
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            Trả về trang 'forgetpassword.html' cho người dùng
+        """
         return render(request, 'forgetpassword.html', self.context)
     
     def post(self, request):
+        """
+        Xử lý yêu cầu cài lại mật khẩu mới cho người dùng
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin email và mật khẩu mới
+        Output:
+            Chuyển hướng đến trang xác thực OTP nếu mật khẩu hợp lệ, hoặc hiển thị thông báo lỗi nếu mật khẩu nhập lại không khớp
+        """
         message = ''
         if request.method == "POST":
             fp_email, npass, cpass = (
@@ -152,34 +209,110 @@ class UserForgetPassword(UserViews):
         return render(request, 'forgetpassword.html', {'message': message if 'message' in locals() else ''})
 
 class UserHeaderView(UserViews):
-    """Load header đối với user"""
     def get(self, request):
+        """
+        Hiển thị header người dùng
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            Trả về trang 'user_header.html' với dữ liệu context
+        """
         return render(request, 'user_header.html', self.context)
 
-class UserContactView(UserViews):
-    """Load trang Contact"""
+class UserHomeView(UserViews):
     def get(self, request):
+        """
+        Hiển thị trang chủ với các bài viết mới nhất, thông tin về lượt thích và bình luận,
+        cũng như thông tin của tác giả
+        Input:
+            request (HttpRequest): Yêu cầu GET từ người dùng
+        Output:
+            HttpResponse: Trả về trang 'home.html' với các bài viết, thông tin về lượt thích và bình luận của người dùng,
+                          và danh sách các tác giả.
+        """
+        posts = Post.objects.filter(status='Đang hoạt động').order_by('-date')[:4]
+          
+        post_data = list(map(lambda post: {
+            'post': post,
+            'total_comments': self.comment_handler.get_post_total_comments(post),
+            'total_likes': self.like_handler.get_post_total_likes(post),
+            'is_liked_by_user': self.like_handler.user_liked_post(post.id),
+            'author': (Admin.objects.filter(id=post.admin_id).first() or {}).name,
+            'author_id': (Admin.objects.filter(id=post.admin_id).first() or {}).id,
+        }, posts))
+        
+        context = {
+            'user_name': self.user_name,
+            'user_comments': self.comment_handler.get_user_comments().count(),
+            'user_likes': self.like_handler.get_user_likes().count(),
+            'posts': post_data,
+            'authors': Admin.objects.all(),
+            'user_id': self.user_id,
+        }
+
+        return render(request, 'home.html', context)
+
+class UserContactView(UserViews):
+    def get(self, request):
+        """
+        Hiển thị trang Liên hệ
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            Trả về trang 'contact.html' với dữ liệu context
+        """
         return render(request, 'contact.html', self.context)
 
 class UserAboutView(UserViews):
-    """Load trang About"""
     def get(self, request):
+        """
+        Hiển thị trang Giới thiệu
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            Trả về trang 'about.html' với dữ liệu context
+        """
         return render(request, 'about.html', self.context)
 
 class UserLogoutView(UserViews):
-    """Đăng xuất"""
     def get(self, request):
+        """
+        Đăng xuất người dùng và chuyển hướng về trang chủ
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            Chuyển hướng về trang 'home' sau khi đăng xuất
+        """
         logout(request)
         return redirect('home')
 
 class UserLoginView(UserViews):
-    """Đăng nhập"""
     def get(self, request):
+        """
+        Hiển thị trang đăng nhập cho user
+        Input:
+            request (HttpRequest): Yêu cầu HTTP GET từ user
+        Output:
+            HttpResponse: 
+                - Nếu user đã đăng nhập (session có 'user_id'): Chuyển hướng đến trang 'home'
+                - Nếu chưa đăng nhập: Hiển thị trang 'login.html'
+        """
         if request.session.get('user_id'):
             return redirect('home')
         return render(request, 'login.html')
      
     def post(self, request):
+        """
+        Xử lý form đăng nhập cho user
+        Input:
+            request (HttpRequest): Yêu cầu HTTP POST chứa thông tin đăng nhập:
+                - email: Tên đăng nhập của user
+                - pass: Mật khẩu của user
+        Output:
+            HttpResponse:
+                - Nếu đăng nhập thành công: Chuyển hướng đến trang 'home'
+                - Nếu đăng nhập thất bại: Hiển thị lại trang 'login.html' cùng thông báo lỗi
+        """
         message = ''
         if request.method == 'POST':
             email = request.POST.get('email')
@@ -198,11 +331,32 @@ class UserLoginView(UserViews):
         return render(request, 'login.html', {'message': message if 'message' in locals() else ''})
 
 class UserRegisterView(UserViews):
-    """Đăng ký""" 
     def get(self, request):
+        """
+        Hiển thị trang đăng ký tài khoản mới
+        Input:
+            request: Đối tượng HttpRequest chứa thông tin yêu cầu
+        Output:
+            HttpResponse:
+                - Trả về trang đăng ký 'register.html' để người dùng nhập thông tin
+        """
         return render(request, 'register.html')
 
     def post(self, request):
+        """
+        Xử lý thông tin đăng ký người dùng và lưu trữ dữ liệu vào session
+        Input:
+            request (HttpRequest): Yêu cầu HTTP POST chứa thông tin đăng ký:
+                - name: Tên người dùng
+                - email: Địa chỉ email của người dùng
+                - pass: Mật khẩu của người dùng
+                - cpass: Mật khẩu nhập lại để xác nhận
+        Output:
+            HttpResponse:
+                - Nếu email đã được đăng ký: Hiển thị lại trang 'register.html' với thông báo lỗi
+                - Nếu mật khẩu và mật khẩu nhập lại không khớp: Hiển thị lại trang 'register.html' với thông báo lỗi
+                - Nếu đăng ký thành công: Chuyển hướng đến trang 'verification' để xác thực OTP người dùng
+        """
         message = ''
         if request.method == 'POST':
             name, email, password, confirm_password = (
@@ -228,11 +382,26 @@ class UserRegisterView(UserViews):
         return render(request, 'register.html', {'message': message if 'message' in locals() else ''})
 
 class UserUpdateProfileView(UserViews):
-    """Chỉnh sửa thông tin cá nhân"""
     def get(self, request):
+        """
+        Hiển thị trang chỉnh sửa thông tin cá nhân của người dùng
+        Input:
+            request (HttpRequest): Yêu cầu GET từ người dùng
+        Output:
+            HttpResponse: Trả về trang 'update.html' với thông tin người dùng hiện tại
+        """
         return render(request, 'update.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
 
     def update_password(self, old_pass, new_pass, confirm_pass):
+        """
+        Cập nhật mật khẩu người dùng sau khi xác thực mật khẩu hiện tại và các điều kiện mật khẩu mới
+        Input:
+            old_pass (str): Mật khẩu hiện tại của người dùng
+            new_pass (str): Mật khẩu mới muốn thay đổi
+            confirm_pass (str): Xác nhận mật khẩu mới
+        Output:
+            str: Thông báo về kết quả cập nhật mật khẩu (thành công hoặc lỗi)
+        """
         if not check_password(old_pass, self.user.password):
             return 'Mật khẩu hiện tại không đúng!'
         elif new_pass != confirm_pass:
@@ -245,6 +414,18 @@ class UserUpdateProfileView(UserViews):
             return 'Mật khẩu được cập nhật thành công!'
 
     def post(self, request):
+        """
+        Xử lý yêu cầu cập nhật thông tin cá nhân của người dùng, bao gồm tên, email và mật khẩu
+        Input:
+            request (HttpRequest): Yêu cầu POST từ người dùng, chứa thông tin cập nhật:
+                - name: Tên người dùng mới
+                - email: Địa chỉ email mới
+                - old_pass: Mật khẩu cũ (nếu thay đổi mật khẩu)
+                - new_pass: Mật khẩu mới (nếu thay đổi mật khẩu)
+                - confirm_pass: Xác nhận mật khẩu mới
+        Output:
+            HttpResponse: Trả về trang 'update.html' với thông báo kết quả cập nhật thông tin cá nhân
+        """
         message = ''
         if request.method == 'POST' and 'submit' in request.POST:
             name = request.POST.get('name', '').strip()
@@ -275,8 +456,15 @@ class UserUpdateProfileView(UserViews):
         return render(request, 'update.html', context)
 
 class UserLikesView(UserViews):
-    """Hiển thị tất cả các bài viết mà user đã Like"""
     def get(self, request):
+        """
+        Hiển thị tất cả các bài viết mà người dùng đã thích
+        Input:
+            request (HttpRequest): Yêu cầu GET từ người dùng
+        Output:
+            HttpResponse: Trả về trang 'user_likes.html' với danh sách các bài viết mà người dùng đã Like,
+                          bao gồm số lượng like và comment của mỗi bài viết
+        """
         post_data = []
         if self.user_id:
             likes = self.like_handler.get_user_likes()
@@ -300,8 +488,16 @@ class UserLikesView(UserViews):
         return render(request, 'user_likes.html', context)
 
 class UserLoadAuthors(UserViews):
-    """Hiển thị các tác giả (là admin) cho user"""
     def get(self, request):
+        """
+        Hiển thị thông tin các tác giả (admin) cho người dùng, bao gồm số lượng bài viết,
+        số lượt like và số lượt comment của mỗi tác giả
+        Input:
+            request (HttpRequest): Yêu cầu GET từ người dùng
+        Output:
+            HttpResponse: Trả về trang 'authors.html' với danh sách các tác giả và thông tin thống kê liên quan
+                          đến các bài viết, like và comment của họ
+        """
         authors = Admin.objects.all()
 
         author_stats = list(map(lambda author: {
@@ -319,34 +515,15 @@ class UserLoadAuthors(UserViews):
         
         return render(request, 'authors.html', context)
 
-class UserHomeView(UserViews):
-    """Load trang Home"""
-    def get(self, request):
-        posts = Post.objects.filter(status='Đang hoạt động').order_by('-date')[:4]
-          
-        post_data = list(map(lambda post: {
-            'post': post,
-            'total_comments': self.comment_handler.get_post_total_comments(post),
-            'total_likes': self.like_handler.get_post_total_likes(post),
-            'is_liked_by_user': self.like_handler.user_liked_post(post.id),
-            'author': (Admin.objects.filter(id=post.admin_id).first() or {}).name,
-            'author_id': (Admin.objects.filter(id=post.admin_id).first() or {}).id,
-        }, posts))
-        
-        context = {
-            'user_name': self.user_name,
-            'user_comments': self.comment_handler.get_user_comments().count(),
-            'user_likes': self.like_handler.get_user_likes().count(),
-            'posts': post_data,
-            'authors': Admin.objects.all(),
-            'user_id': self.user_id,
-        }
-
-        return render(request, 'home.html', context)
-
 class UserCommentsView(UserViews):
-    """Hiển thị tất cả comment mà user đã comment"""
     def get(self, request):
+        """
+        Hiển thị tất cả các bình luận mà người dùng đã thực hiện
+        Input:
+            request (HttpRequest): Yêu cầu HTTP GET để tải trang bình luận của người dùng
+        Output:
+            HttpResponse: Trả về trang HTML 'user_comments.html' với danh sách bình luận của người dùng
+        """
         if self.user_id:
             comments = self.comment_handler.get_user_comments()
         
@@ -359,6 +536,16 @@ class UserCommentsView(UserViews):
         return render(request, 'user_comments.html', context)
 
     def post(self, request):
+        """
+        Xử lý các hành động cho bình luận của người dùng: chỉnh sửa, xóa và mở hộp chỉnh sửa
+        Input:
+            request (HttpRequest): Yêu cầu HTTP POST chứa các thao tác với bình luận của người dùng
+        Output:
+            HttpResponse: Trả về trang HTML 'user_comments.html' với các thông báo và trạng thái hiện tại của bình luận.
+                - Nếu chỉnh sửa bình luận thành công: Thông báo "Chỉnh sửa bình luận thành công!"
+                - Nếu bình luận đã tồn tại: Thông báo "Bình luận đã tồn tại!"
+                - Nếu xóa bình luận thành công: Thông báo "Bình luận được xóa thành công!"
+        """
         comment_id = None
         edit_comment = None
         message = ''
@@ -394,8 +581,15 @@ class UserCommentsView(UserViews):
         return render(request, 'user_comments.html', context)
     
 class UserLikedPost(UserViews):
-    """Like hoặc Unlike bài post"""
     def post(self, request, **kwargs):
+        """
+        Xử lý người dùng thực hiện hành động Like hoặc Unlike đối với bài viết
+        Input:
+            request (HttpRequest): Yêu cầu POST từ người dùng, chứa thông tin bài viết cần Like hoặc Unlike
+            kwargs (dict): Chứa tham số `post_id` để xác định bài viết người dùng muốn Like hoặc Unlike
+        Output:
+            HttpResponse: Chuyển hướng về trang trước đó (HTTP_REFERER), cập nhật trạng thái Like của bài viết
+        """
         post_id = kwargs.get('post_id')
         like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
         post = Post.objects.get(id=post_id)

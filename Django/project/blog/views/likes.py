@@ -11,11 +11,11 @@ class LikeViews:
         return total_likes
 
     def get_user_likes(self):
-        """Lấy tất cả lượt like của người dùng đã like"""
+        """Lấy tất cả thông tin liên quan đến các lượt like của người dùng đã like"""
         return Like.objects.filter(user_id=self.user_id)
     
     def get_admin_likes(self, **kwargs):
-        """Lấy tất cả lượt like mà admin nhận được"""
+        """Lấy tất cả thông tin liên quan đến các lượt like mà admin nhận được"""
         admin_id = kwargs.get('admin_id')
         return Like.objects.filter(admin_id=admin_id)
     
@@ -24,4 +24,5 @@ class LikeViews:
         return Like.objects.filter(user_id=self.user_id, post_id=post_id).exists()
     
     def like_post(self, user, admin, post):
+        """Người dùng thực hiện like một bài viết"""
         return Like.objects.create(user_id=user, admin_id=admin, post_id=post)

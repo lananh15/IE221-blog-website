@@ -1,4 +1,5 @@
 mysqlclient
+django
 django-allauth
 django-tinymce
 python-dotenv

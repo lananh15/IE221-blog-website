@@ -9,16 +9,17 @@ class CommentViews:
     def get_current_comment(self, comment_id):
         """Lấy comment với id=comment_id"""
         return Comment.objects.get(id=comment_id)
+    
     def get_user_comments(self):
-        """Lấy tất cả các bình luận của người dùng đã bình luận"""
+        """Lấy tất cả thông tin liên quan đến các bình luận của người dùng đã bình luận"""
         return Comment.objects.filter(user_id=self.user_id)
     
     def get_current_comments(self, comment_id):
-        """Lấy bình luận hiện tại người dùng"""
+        """Lấy bình luận hiện tại của người dùng"""
         return Comment.objects.filter(id=comment_id, user_id=self.user_id).first()
 
     def get_user_comments_of_post(self, post_id):
-        """Lấy tất cả các bình luận của người dùng cho một bài viết"""
+        """Lấy tất cả các bình luận của người dùng của một bài viết"""
         return Comment.objects.filter(post_id=post_id, user_id=self.user_id)
 
     def get_all_comments(self, post_id):
@@ -31,7 +32,7 @@ class CommentViews:
         return total_comments
 
     def get_admin_comments(self, **kwargs):
-        """Lấy tất cả bình luận của admin"""
+        """Lấy tất cả thông tin liên quan đến các bình luận mà admin nhận được"""
         admin_id = kwargs.get('admin_id')
         return Comment.objects.filter(admin_id=admin_id)
     
@@ -62,7 +63,7 @@ class CommentViews:
         return None
     
     def delete_comment(self, **kwargs):
-        """User và Admin xóa một bình luận"""
+        """Xóa một bình luận"""
         comment_id = kwargs.get('comment_id')
         user_id = kwargs.get('user_id', None)
         admin_id = kwargs.get('admin_id', None)
@@ -77,9 +78,9 @@ class CommentViews:
         return False
     
     def comment_exists(self, comment_text, comment_id):
-        """Kiểm tra xem một comment có cùng nội dung đã tồn tại với ID comment cụ thể hay chưa."""
+        """Kiểm tra xem bình luận có cùng nội dung đã tồn tại với ID comment cụ thể hay chưa"""
         return Comment.objects.filter(comment=comment_text, id=comment_id).exists()
     
     def update_comment(self, comment_id, new_text):
-        """Cập nhật comment nếu comment thuộc về người dùng hiện tại."""
+        """Cập nhật comment nếu comment thuộc về người dùng hiện tại"""
         return Comment.objects.filter(id=comment_id, user_id=self.user_id).update(comment=new_text)

@@ -33,8 +33,8 @@ def google_login_handler(sender, request, user, **kwargs):
             existing_user = User.objects.get(email=email)
             user_id = existing_user.id
             user_name = existing_user.name
-            print(f"Existing user found: ID = {user_id}, Name = {user_name}")
+            print(f"Đã tìm thấy người dùng hiện tại: ID = {user_id}, Name = {user_name}")
             request.session['user_id'] = existing_user.id
 
     except SocialAccount.DoesNotExist:
-        print("User does not have a linked Google account.")
+        print("Người dùng không có tài khoản Google được liên kết.")

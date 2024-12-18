@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Admin, User, Post, Like, Comment
+from django.shortcuts import render
+from ..models import Post
 from .posts import PostsViews
 
 from django.views import View
@@ -7,11 +7,23 @@ from django.db.models import Q
 
 class SearchPostView(PostsViews, View):    
     def get(self, request):
-
+        """
+        Hiển thị trang tìm kiếm bài viết
+        Input:
+            request (HttpRequest): Đối tượng yêu cầu từ user
+        Output:
+            HttpResponse: Trả về trang tìm kiếm (search.html) mà người dùng có thể nhập từ khóa để tìm kiếm bài viết
+        """
         return render(request, 'search.html')
     
     def post(self, request):
-        " Hàm tìm bài viết có tiêu đề, nội dung hoặc thể loại chứa ký tự tương ứng"
+        """
+        Tìm kiếm bài viết theo tiêu đề, nội dung hoặc thể loại chứa từ khóa tìm kiếm
+        Input:
+            request (HttpRequest): Đối tượng yêu cầu từ client, chứa từ khóa tìm kiếm trong `search_box`
+        Output:
+            HttpResponse: Trả về trang tìm kiếm (search.html) với các bài viết phù hợp
+        """
         search_box = request.POST.get('search_box', '')
         keys = Post.objects.filter(
             Q(content__icontains=search_box) |
