@@ -590,6 +590,8 @@ class UserLikedPost(UserViews):
         Output:
             HttpResponse: Chuyển hướng về trang trước đó (HTTP_REFERER), cập nhật trạng thái Like của bài viết
         """
+        if not self.user_id:
+            return redirect('login')
         post_id = kwargs.get('post_id')
         like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
         post = Post.objects.get(id=post_id)

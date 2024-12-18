@@ -25,7 +25,7 @@
 
       {% if posts %}
          {% for item in posts %}
-         <form class="box" method="post">
+         <form class="box" method="post" action="{% url 'like_post' item.post.id %}">
             {% csrf_token %}
             <input type="hidden" name="post_id" value="{{ item.post.id }}">
             <input type="hidden" name="admin_id" value="{{ item.post.admin_id }}">
@@ -52,10 +52,14 @@
 
             <div class="icons">
                <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
+               {% if user_id %}
                <button type="submit" name="like_post">
                    <i class="fas fa-heart" style="{% if item.is_liked_by_user %}color: red;{% endif %}"></i>
                    <span>({{ item.total_likes }})</span>
                </button>
+               {% else %}
+                  <span><i class="fas fa-heart"></i> ({{ item.total_likes }})</span>
+               {% endif %}
             </div>
          </form>
          {% endfor %}

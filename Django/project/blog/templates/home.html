@@ -185,10 +185,14 @@
                                 <i class="fas fa-comment"></i>
                                 <span>({{ item.total_comments }})</span>
                             </a>
+                            {% if user_id %}
                             <button type="submit" name="like_post">
                                 <i class="fas fa-heart" style="{% if item.is_liked_by_user %}color:red;{% endif %}"></i>
                                 <span>({{ item.total_likes }})</span>
                             </button>
+                            {% else %}
+                                <span><i class="fas fa-heart"></i> ({{ item.total_likes }})</span>
+                            {% endif %}
                         </div>
                     </form>
                     {% endfor %}
