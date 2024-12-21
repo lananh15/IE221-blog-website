@@ -9,6 +9,7 @@ urlpatterns = [
     path('close-popup/', google_login_callback, name='close_popup'),
     path('search/', SearchPostView.as_view(), name='search'),
     path('login/', UserLoginView.as_view(), name='login'),
+    path('login-with-uit/', UserLoginWithUITView.as_view(), name='login_with_uit'),
     path('logout/', UserLogoutView.as_view(), name='user_logout'),
     path('register/', UserRegisterView.as_view(), name='register'),
     path('user_header/', UserHeaderView.as_view(), name='user_header'),

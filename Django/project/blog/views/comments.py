@@ -19,7 +19,7 @@ class CommentViews:
         return Comment.objects.filter(id=comment_id, user_id=self.user_id).first()
 
     def get_user_comments_of_post(self, post_id):
-        """Lấy tất cả các bình luận của người dùng của một bài viết"""
+        """Lấy tất cả các thông tin liên quan đến bình luận của người dùng trong một bài viết"""
         return Comment.objects.filter(post_id=post_id, user_id=self.user_id)
 
     def get_all_comments(self, post_id):
@@ -78,7 +78,7 @@ class CommentViews:
         return False
     
     def comment_exists(self, comment_text, comment_id):
-        """Kiểm tra xem bình luận có cùng nội dung đã tồn tại với ID comment cụ thể hay chưa"""
+        """Kiểm tra xem bình luận vừa chỉnh sửa có cùng nội dung đã tồn tại trước khi chỉnh sửa hay không"""
         return Comment.objects.filter(comment=comment_text, id=comment_id).exists()
     
     def update_comment(self, comment_id, new_text):

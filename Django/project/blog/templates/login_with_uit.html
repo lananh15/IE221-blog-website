@@ -6,7 +6,7 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Đăng nhập</title>
+   <title>Đăng nhập với UIT</title>
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -47,11 +47,6 @@
          <i class="fab fa-google"></i>
          Tiếp tục với Google
       </a>
-      <a href="{% url 'login_with_uit' %}"
-         class="btn btn-google">
-         <img src="{% static 'image/Logo_UIT_updated.svg' %}" style="width:8%">
-         &nbsp;&nbsp;&nbsp;Tiếp tục với UIT
-      </a>
 
       <div class="divider">
          <span>HOẶC</span>
@@ -60,37 +55,17 @@
       {% if message %}
       <p class="error">{{ message }}</p>
       {% endif %}
-
-      <label class="label-form">Email</label>
-      <input type="email" name="email" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+        <img src="{% static 'image/Logo_UIT_updated.svg' %}" style="width:17%">
+      <label class="label-form">Tài khoản</label>
+      <input type="text" name="mssv" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
       <label class="label-form">Mật khẩu</label>
       <input type="password" name="pass" required class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <p style="text-align: left; padding-bottom: .6rem; font-size:1.5rem"><a style="color: black;" href="{% url 'forget_password' %}">Quên mật khẩu?</a></p>
       <input type="submit" value="Đăng nhập" name="submit" class="btn">
       <p>Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký</a></p>
    </form>
 </section>
 
 <script src="{% static 'js/script.js' %}"></script>
-<script>
-function openPopup(url, title, width, height) {
-   const left = (screen.width - width) / 2;
-   const top = (screen.height - height) / 2;
-
-   // Mở popup và giữ focus cho cửa sổ chính
-   const popup = window.open(url, title, `width=${width},height=${height},top=${top},left=${left}`);
-   
-   // Kiểm tra khi popup bị đóng
-   const checkPopupClosed = setInterval(function() {
-      if (popup.closed) {
-         window.location.href = '/';  // Điều hướng trang chính về Home
-         clearInterval(checkPopupClosed); // Dừng kiểm tra
-      }
-   }, 1000);  // Kiểm tra mỗi giây
-
-   return false;
-}
-</script>
 
 </body>
 </html>

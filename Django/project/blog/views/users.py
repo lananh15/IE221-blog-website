@@ -15,6 +15,9 @@ import string
 from django.core.mail import send_mail
 from django.conf import settings
 
+import requests
+from bs4 import BeautifulSoup
+
 class UserViews(BaseView):
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.session.get('user_id', None)
@@ -329,6 +332,115 @@ class UserLoginView(UserViews):
                 message = 'Tên đăng nhập hoặc mật khẩu không đúng!'
 
         return render(request, 'login.html', {'message': message if 'message' in locals() else ''})
+
+class UserLoginWithUITView(UserViews):
+    login_url = "https://chungthuc.uit.edu.vn/Login.aspx"
+    def get(self, request):
+        """
+        Hiển thị trang đăng nhập với UIT cho user
+        Input:
+            request (HttpRequest): Yêu cầu HTTP GET từ user
+        Output:
+            HttpResponse: 
+                - Nếu user đã đăng nhập (session có 'user_id'): Chuyển hướng đến trang 'home'
+                - Nếu chưa đăng nhập: Hiển thị trang 'login_with_uit.html'
+        """
+        if request.session.get('user_id'):
+            return redirect('home')
+        return render(request, 'login_with_uit.html')
+    
+    def initialize_session_uit (self):
+        """
+        Khởi tạo session và lấy các giá trị cần thiết cho việc đăng nhập vào hệ thống UIT
+        Output:
+            tuple: 
+                - viewstate (str): Giá trị của __VIEWSTATE
+                - eventvalidation (str): Giá trị của __EVENTVALIDATION
+                - session (requests.Session): Đối tượng session cho các yêu cầu tiếp theo
+        """
+        with requests.Session() as session:
+            response = session.get(self.login_url)
+            
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, "html.parser")
+
+                viewstate = soup.find(id="__VIEWSTATE")["value"]
+                eventvalidation = soup.find(id="__EVENTVALIDATION")["value"]
+            else:
+                viewstate = None
+                eventvalidation = None
+        return viewstate, eventvalidation, session
+    
+    def get_info_account_uit (self, **kwargs):
+        """
+        Lấy thông tin tài khoản từ hệ thống UIT sau khi đăng nhập thành công
+        Input:
+            kwargs (dict): 
+                - viewstate (str): Giá trị __VIEWSTATE
+                - eventvalidation (str): Giá trị __EVENTVALIDATION
+                - username (str): Tên đăng nhập của người dùng
+                - password (str): Mật khẩu của người dùng
+                - session (requests.Session): Session đang sử dụng
+        Output:
+            tuple:
+                - email (str): Email của người dùng
+                - full_name (str): Tên đầy đủ của người dùng
+        """
+        viewstate = kwargs.get('viewstate', None)
+        eventvalidation = kwargs.get('eventvalidation', None)
+        username = kwargs.get('username','')
+        password = kwargs.get('password', '')
+        session = kwargs.get('session', None)
+        payload = {
+            "__VIEWSTATE": viewstate,
+            "__EVENTVALIDATION": eventvalidation,
+            "UcLogin1:tbUsername": str(username),  
+            "UcLogin1:tbPassword": str(password),
+            "UcLogin1:btLogin": "Đăng nhập"
+        }
+
+        login_response = session.post(self.login_url, data=payload)
+        login_soup = BeautifulSoup(login_response.text, "html.parser")
+
+        full_name = login_soup.find(id="UcUserProfile1_tbFN")["value"].split(" -")[0]
+        email = login_soup.find(id="UcUserProfile1_tbEmail")["value"]
+
+        return email, full_name
+    
+    def post(self, request):
+        """
+        Xử lý đăng nhập cho user thông qua thông tin từ hệ thống UIT
+        Input:
+            request (HttpRequest): Yêu cầu HTTP POST từ user với thông tin đăng nhập
+        Output:
+            HttpResponse:
+                - Nếu đăng nhập thành công (đã có tài khoản trong CSDL): Chuyển hướng đến trang 'home'
+                - Nếu chưa có tài khoản: Tạo tài khoản mới và chuyển hướng đến 'home'
+                - Nếu có thông báo lỗi: Hiển thị lại trang đăng nhập với thông báo lỗi
+        """
+        message = ''
+        if request.method == 'POST':
+            username = request.POST.get('mssv')
+            password = request.POST.get('pass')
+
+            viewstate, eventvalidation, session = self.initialize_session_uit()
+            email, full_name = self.get_info_account_uit(viewstate=viewstate, eventvalidation=eventvalidation, 
+                                                         username=username, password=password, session=session)
+            try:
+                user = User.objects.get(email=email)
+                if user:
+                    user.password = make_password(password)
+                    user.save()
+                    request.session['user_id'] = user.id
+                    return redirect('home')
+            except User.DoesNotExist:
+                User.objects.create(name=full_name, email=email, password=make_password(password))
+                message = 'Tạo tài khoản mới thành công!'
+                user = User.objects.get(email=email)
+                request.session['user_id'] = user.id
+                return redirect('home')
+
+        return render(request, 'login_with_uit.html', {'message': message if 'message' in locals() else ''})
 
 class UserRegisterView(UserViews):
     def get(self, request):
