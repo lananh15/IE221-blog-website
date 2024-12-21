@@ -414,7 +414,8 @@ class UserLoginWithUITView(UserViews):
             request (HttpRequest): Yêu cầu HTTP POST từ user với thông tin đăng nhập
         Output:
             HttpResponse:
-                - Nếu đăng nhập thành công (đã có tài khoản trong CSDL): Chuyển hướng đến trang 'home'
+                - Nếu đăng nhập thành công (đã có tài khoản trong CSDL): Lưu lại password của mail trường và 
+                    chuyển hướng đến trang 'home'
                 - Nếu chưa có tài khoản: Tạo tài khoản mới và chuyển hướng đến 'home'
                 - Nếu có thông báo lỗi: Hiển thị lại trang đăng nhập với thông báo lỗi
         """
