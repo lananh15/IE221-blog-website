@@ -435,8 +435,6 @@ class UserLoginWithUITView(UserViews):
             try:
                 user = User.objects.get(email=email)
                 if user:
-                    user.password = make_password(password)
-                    user.save()
                     request.session['user_id'] = user.id
                     return redirect('home')
             except User.DoesNotExist:
