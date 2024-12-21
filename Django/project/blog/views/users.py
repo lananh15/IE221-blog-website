@@ -65,6 +65,11 @@ class UserViews(BaseView):
         send_mail(subject, '', settings.EMAIL_HOST_USER, [email], html_message=message)
         request.session['otp_sent_time'] = timezone.now().isoformat()
 
+    @staticmethod
+    def check_uit_email(email):
+        return email.endswith("gm.uit.edu.vn")
+
+
 def google_login_callback(request):
     """
     Xử lý callback sau khi người dùng đăng nhập thành công qua Google (popup)
@@ -503,7 +508,10 @@ class UserUpdateProfileView(UserViews):
         Output:
             HttpResponse: Trả về trang 'update.html' với thông tin người dùng hiện tại
         """
-        return render(request, 'update.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email})
+        if self.check_uit_email(self.user.email):
+            message = "Các tài khoản có đuôi email là gm.uit.edu.vn sẽ không được cập nhật bất kì thông tin gì."
+
+        return render(request, 'update.html', {'user_name': self.user_name, 'user_id': self.user_id, 'user_email': self.user_email, 'message': message})
 
     def update_password(self, old_pass, new_pass, confirm_pass):
         """
@@ -543,22 +551,26 @@ class UserUpdateProfileView(UserViews):
         if request.method == 'POST' and 'submit' in request.POST:
             name = request.POST.get('name', '').strip()
             email = request.POST.get('email', '').strip()
+            
+            if self.user.email.endswith("gm.uit.edu.vn"):
+                message = "Các tài khoản có đuôi email là gm.uit.edu.vn sẽ không được cập nhật bất kì thông tin gì."
 
-            self.user.name = name if name else self.user.name
-            self.user.save()
+            else:
+                self.user.name = name if name else self.user.name
+                self.user.save()
 
-            if email and User.objects.filter(email=email).exclude(id=self.user_id).exists():
-                    message = 'Email đã được đăng ký!'
-            elif email:
+                if email and User.objects.filter(email=email).exclude(id=self.user_id).exists():
+                        message = 'Email đã được đăng ký!'
+                elif email:
                     self.user.email = email
                     self.user.save()
 
-            old_pass = request.POST.get('old_pass', '').strip()
-            new_pass = request.POST.get('new_pass', '').strip()
-            confirm_pass = request.POST.get('confirm_pass', '').strip()
-            
-            if old_pass:
-                message = self.update_password(old_pass, new_pass, confirm_pass)
+                old_pass = request.POST.get('old_pass', '').strip()
+                new_pass = request.POST.get('new_pass', '').strip()
+                confirm_pass = request.POST.get('confirm_pass', '').strip()
+                
+                if old_pass:
+                    message = self.update_password(old_pass, new_pass, confirm_pass)
 
         context = {
             'user_name': self.user.name,

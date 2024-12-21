@@ -21,14 +21,18 @@
 <section class="form-container">
 
    <form action="" method="post">
-      {% csrf_token %}
-      <h3>Cập nhật hồ sơ</h3>
-      <input type="text" name="name" placeholder="{{ user_name }}" class="box" maxlength="50">
-      <input type="email" name="email" placeholder="{{ user_email }}" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="old_pass" placeholder="Nhập mật khẩu hiện tại" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="new_pass" placeholder="Nhập mật khẩu mới" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="password" name="confirm_pass" placeholder="Nhập lại mật khẩu mới" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
-      <input type="submit" value="Cập nhật" name="submit" class="btn">
+   {% csrf_token %}
+   <h3>{% if message %}Xem hồ sơ{% else %}Cập nhật hồ sơ{% endif %}</h3>
+
+   <input type="text" name="name" placeholder="{{ user_name }}" class="box" maxlength="50">
+   <input type="email" name="email" placeholder="{{ user_email }}" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+
+   {% if not message %}
+   <input type="password" name="old_pass" placeholder="Nhập mật khẩu hiện tại" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+   <input type="password" name="new_pass" placeholder="Nhập mật khẩu mới" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+   <input type="password" name="confirm_pass" placeholder="Nhập lại mật khẩu mới" class="box" maxlength="50" oninput="this.value = this.value.replace(/\s/g, '')">
+   <input type="submit" value="Cập nhật" name="submit" class="btn">
+   {% endif %}
    </form>
 
 </section>
