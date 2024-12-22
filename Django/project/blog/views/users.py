@@ -416,10 +416,15 @@ class UserLoginWithUITView(UserViews):
         login_response = session.post(self.login_url, data=payload)
         login_soup = BeautifulSoup(login_response.text, "html.parser")
 
-        full_name = login_soup.find(id="UcUserProfile1_tbFN")["value"].split(" -")[0]
-        email = login_soup.find(id="UcUserProfile1_tbEmail")["value"]
+        full_name_tag = login_soup.find(id="UcUserProfile1_tbFN")
+        email_tag = login_soup.find(id="UcUserProfile1_tbEmail")
 
-        return email, full_name
+        if full_name_tag and email_tag:
+            full_name = full_name_tag["value"].split(" -")[0]
+            email = email_tag["value"]
+            return email, full_name
+        else:
+            raise ValueError("Không thể lấy thông tin. Vui lòng kiểm tra tài khoản và mật khẩu.")
     
     def post(self, request):
         """
@@ -438,22 +443,38 @@ class UserLoginWithUITView(UserViews):
             username = request.POST.get('mssv')
             password = request.POST.get('pass')
 
-            viewstate, eventvalidation, session = self.initialize_session_uit()
-            email, full_name = self.get_info_account_uit(viewstate=viewstate, eventvalidation=eventvalidation, 
-                                                         username=username, password=password, session=session)
             try:
-                user = User.objects.get(email=email)
-                if user:
-                    request.session['user_id'] = user.id
-                    return redirect('home')
-            except User.DoesNotExist:
-                User.objects.create(name=full_name, email=email, password=make_password(password))
-                message = 'Tạo tài khoản mới thành công!'
-                user = User.objects.get(email=email)
-                request.session['user_id'] = user.id
-                return redirect('home')
+                # Khởi tạo session UIT
+                viewstate, eventvalidation, session = self.initialize_session_uit()
 
-        return render(request, 'login_with_uit.html', {'message': message if 'message' in locals() else ''})
+                # Lấy thông tin tài khoản từ UIT
+                try:
+                    email, full_name = self.get_info_account_uit(
+                        viewstate=viewstate,
+                        eventvalidation=eventvalidation,
+                        username=username,
+                        password=password,
+                        session=session
+                    )
+                except ValueError as e:
+                    message = str(e)
+                    return render(request, 'login_with_uit.html', {'message': message, 'username': username})
+
+                try:
+                    user = User.objects.get(email=email)
+                    if user:
+                        request.session['user_id'] = user.id
+                        return redirect('home')
+                except User.DoesNotExist:
+                    User.objects.create(name=full_name, email=email, password=make_password(password))
+                    request.session['user_id'] = User.objects.get(email=email).id
+                    return redirect('home')
+
+            except Exception as e:
+                message = "Có lỗi xảy ra trong quá trình kết nối đến hệ thống UIT. Vui lòng thử lại sau."
+                return render(request, 'login_with_uit.html', {'message': message, 'username': username})
+
+        return render(request, 'login_with_uit.html', {'message': message})
 
 class UserRegisterView(UserViews):
     def get(self, request):
