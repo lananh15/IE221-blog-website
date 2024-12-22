@@ -67,6 +67,15 @@ class UserViews(BaseView):
 
     @staticmethod
     def check_uit_email(email):
+        """
+        Kiểm tra xem email có kết thúc bằng "gm.uit.edu.vn" hay không
+        Input:
+            email (str): Địa chỉ email cần kiểm tra
+        Output:
+            bool: 
+                - True nếu email kết thúc bằng "gm.uit.edu.vn"
+                - False nếu không
+        """
         return email.endswith("gm.uit.edu.vn")
 
 
