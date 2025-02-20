@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from ..models import Admin, User, Post, Like
 from django.contrib.auth import logout
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from datetime import timedelta
@@ -11,6 +11,7 @@ from .base import BaseView
 
 import random
 import string
+import re
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -56,12 +57,14 @@ class UserViews(BaseView):
             None
         """
         subject = '[PyBlog] Mã Xác Thực'
-        message = f"""<h3 style='display:block;text-align:center;font-size:18px;'> Xác thực </h3>
-                        <p>Mã xác thực của bạn là:
-                            <strong style='display:block;text-align:center;font-size:25px;'>{otp_code}</strong>
-                        </p>
-                        <p>Mã xác thực này chỉ có hiệu lực trong vòng 3 phút. Vui lòng nhập mã xác thực này để hoàn thành quy trình.</p>
-                        <p>Thân mến,<br>PyBlog.</p>"""
+        message = f"""<div style="max-width: 400px; margin: 0 auto; padding: 15px; font-family: Arial, sans-serif; text-align: center; border: 1px solid #ddd; border-radius: 8px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);">
+                        <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Xác thực</h3>
+                        <p style="font-size: 16px; color: #555;">Mã xác thực của bạn là:</p>
+                        <strong style="display: inline-block; font-size: 28px; color: #d9534f; padding: 10px 20px; border: 2px dashed #d9534f; border-radius: 5px;">{otp_code}</strong>
+                        <p style="font-size: 14px; color: #777; margin-top: 15px;">Mã xác thực này chỉ có hiệu lực trong vòng <strong>3 phút</strong>. Vui lòng nhập mã để hoàn thành quy trình.</p>
+                        <p style="font-size: 14px; color: #777; margin-top: 15px;">Thân mến,<br><strong>PyBlog</strong></p>
+                    </div>
+                    """
         send_mail(subject, '', settings.EMAIL_HOST_USER, [email], html_message=message)
         request.session['otp_sent_time'] = timezone.now().isoformat()
 
@@ -476,6 +479,23 @@ class UserLoginWithUITView(UserViews):
 
         return render(request, 'login_with_uit.html', {'message': message})
 
+class UserCheckPasswordStrengthView(UserViews):
+    def post(self, request, *args, **kwargs):
+        password = request.POST.get("password", "")
+
+        if len(password) < 8:
+            return JsonResponse({"valid": False, "message": "Mật khẩu phải có ít nhất 8 ký tự."})
+        if not re.search(r"[A-Z]", password):
+            return JsonResponse({"valid": False, "message": "Mật khẩu phải chứa ít nhất một chữ cái viết hoa."})
+        if not re.search(r"[a-z]", password):
+            return JsonResponse({"valid": False, "message": "Mật khẩu phải chứa ít nhất một chữ cái viết thường."})
+        if not re.search(r"\d", password):
+            return JsonResponse({"valid": False, "message": "Mật khẩu phải chứa ít nhất một số."})
+        if not re.search(r"[@$!%*?&]", password):
+            return JsonResponse({"valid": False, "message": "Mật khẩu phải chứa ít nhất một ký tự đặc biệt (@$!%*?&)."})
+
+        return JsonResponse({"valid": True, "message": "Mật khẩu mạnh!"})
+    
 class UserRegisterView(UserViews):
     def get(self, request):
         """
@@ -536,6 +556,7 @@ class UserUpdateProfileView(UserViews):
         Output:
             HttpResponse: Trả về trang 'update.html' với thông tin người dùng hiện tại
         """
+        message = ""
         if self.check_uit_email(self.user.email):
             message = "Các tài khoản có đuôi email là gm.uit.edu.vn sẽ không được cập nhật bất kì thông tin gì."
 
@@ -551,7 +572,12 @@ class UserUpdateProfileView(UserViews):
         Output:
             str: Thông báo về kết quả cập nhật mật khẩu (thành công hoặc lỗi)
         """
-        if not check_password(old_pass, self.user.password):
+        if not self.user.password or self.user.password == "":
+            old_pass_valid = True  # Bỏ qua kiểm tra mật khẩu cũ
+        else:
+            old_pass_valid = check_password(old_pass, self.user.password)
+
+        if not old_pass_valid:
             return 'Mật khẩu hiện tại không đúng!'
         elif new_pass != confirm_pass:
             return 'Mật khẩu nhập lại không chính xác!'
@@ -560,7 +586,7 @@ class UserUpdateProfileView(UserViews):
         else:
             self.user.password = make_password(new_pass)
             self.user.save()
-            return 'Mật khẩu được cập nhật thành công!'
+            return 'Cập nhật thành công!'
 
     def post(self, request):
         """
@@ -588,7 +614,7 @@ class UserUpdateProfileView(UserViews):
                 self.user.save()
 
                 if email and User.objects.filter(email=email).exclude(id=self.user_id).exists():
-                        message = 'Email đã được đăng ký!'
+                    message = 'Email đã được đăng ký!'
                 elif email:
                     self.user.email = email
                     self.user.save()
@@ -596,8 +622,8 @@ class UserUpdateProfileView(UserViews):
                 old_pass = request.POST.get('old_pass', '').strip()
                 new_pass = request.POST.get('new_pass', '').strip()
                 confirm_pass = request.POST.get('confirm_pass', '').strip()
-                
-                if old_pass:
+
+                if old_pass or (old_pass == "" and self.user.password == ""):
                     message = self.update_password(old_pass, new_pass, confirm_pass)
 
         context = {

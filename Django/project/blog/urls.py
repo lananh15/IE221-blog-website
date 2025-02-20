@@ -12,6 +12,7 @@ urlpatterns = [
     path('login-with-uit/', UserLoginWithUITView.as_view(), name='login_with_uit'),
     path('logout/', UserLogoutView.as_view(), name='user_logout'),
     path('register/', UserRegisterView.as_view(), name='register'),
+    path('check-password/', UserCheckPasswordStrengthView.as_view(), name='check_password_strength'),
     path('user_header/', UserHeaderView.as_view(), name='user_header'),
     path('', UserHomeView.as_view(), name='home'),
     path('contact/', UserContactView.as_view(), name='contact'),
