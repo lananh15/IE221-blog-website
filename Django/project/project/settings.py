@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q&x9tr8otdazf4ip9m)3haqk0c1i1hacf7&wztfm9#d^icdn0='
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'fallback-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -114,15 +114,15 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'defaultdb',  # Tên cơ sở dữ liệu
-        'USER': 'avnadmin',  # Tên người dùng MySQL
-        'PASSWORD': 'AVNS_rJlKFXve7NFmsh7WIVB',  # Mật khẩu MySQL
-        'HOST': 'mysql-dev-blog-lananhngo685-dev-blog.h.aivencloud.com',  # Host của database từ xa
-        'PORT': '14981',  # Cổng của MySQL server từ xa
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'ssl': {
-                'ca': os.path.join(BASE_DIR, 'cert', 'ca.pem'),  # Thay đổi đường dẫn này nếu cần thiết
+                'ca': os.path.join(BASE_DIR, 'cert', 'ca.pem'),
             },
         },
     }

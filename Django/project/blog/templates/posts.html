@@ -4,6 +4,7 @@
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="csrf-token" content="{{ csrf_token }}">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Bài viết</title>
 
@@ -11,6 +12,7 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
 <body>
@@ -44,13 +46,13 @@
             
             <div class="post-title">{{ item.post.title }}</div>
             <div class="post-content content-150">{{ item.post.content|safe }}</div>
-            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Read More</a>
+            <a href="{% url 'view_post' post_id=item.post.id %}" class="inline-btn">Đọc thêm</a>
             <a href="{% url 'category' category_name=item.post.category %}" class="post-cat"> 
                 <i class="fas fa-tag"></i> 
                 <span>{{ item.post.category }}</span>
             </a>
 
-            <div class="icons">
+            <!-- <div class="icons">
                <a href="{% url 'view_post' post_id=item.post.id %}"><i class="fas fa-comment"></i><span>({{ item.total_comments }})</span></a>
                {% if user_id %}
                <button type="submit" name="like_post">
@@ -60,7 +62,23 @@
                {% else %}
                   <span><i class="fas fa-heart"></i> ({{ item.total_likes }})</span>
                {% endif %}
+            </div> -->
+
+            <div class="icons">
+               <a href="{% url 'view_post' post_id=item.post.id %}">
+                  <i class="fas fa-comment"></i><span>({{ item.total_comments }})</span>
+               </a>
+               
+               {% if user_id %}
+               <button type="button" class="like-btn" data-post-id="{{ item.post.id }}">
+                  <i class="fas fa-heart" style="{% if item.is_liked_by_user %}color: red;{% endif %}"></i>
+                  <span class="like-count">({{ item.total_likes }})</span>
+               </button>
+               {% else %}
+               <span><i class="fas fa-heart"></i> ({{ item.total_likes }})</span>
+               {% endif %}
             </div>
+
          </form>
          {% endfor %}
       {% else %}
@@ -71,7 +89,6 @@
 </section>
 
 {% include 'footer.html' %}
-
 <script src="{% static 'js/script.js' %}"></script>
 
 </body>

@@ -6,6 +6,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from .base import BaseView
 
@@ -758,7 +760,8 @@ class UserCommentsView(UserViews):
         }
 
         return render(request, 'user_comments.html', context)
-    
+
+@method_decorator(csrf_exempt, name='dispatch')    
 class UserLikedPost(UserViews):
     def post(self, request, **kwargs):
         """
@@ -769,16 +772,35 @@ class UserLikedPost(UserViews):
         Output:
             HttpResponse: Chuyển hướng về trang trước đó (HTTP_REFERER), cập nhật trạng thái Like của bài viết
         """
-        if not self.user_id:
-            return redirect('login')
+        # if not self.user_id:
+        #     return redirect('login')
+        # post_id = kwargs.get('post_id')
+        # like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
+        # post = Post.objects.get(id=post_id)
+        # admin = Admin.objects.get(id=post.admin_id)
+
+        # if like:
+        #     like.delete()
+        # else:
+        #     self.like_handler.like_post(self.user, admin, post)
+
+        # return redirect(request.META.get('HTTP_REFERER'))
+
+        if not request.session.get('user_id'):
+            return JsonResponse({"error": "Unauthorized"}, status=401)
+
         post_id = kwargs.get('post_id')
-        like = Like.objects.filter(user_id=self.user_id, post_id=post_id).first()
+        like = Like.objects.filter(user_id=request.session.get('user_id'), post_id=post_id).first()
         post = Post.objects.get(id=post_id)
         admin = Admin.objects.get(id=post.admin_id)
 
         if like:
             like.delete()
+            liked = False
         else:
             self.like_handler.like_post(self.user, admin, post)
+            liked = True
 
-        return redirect(request.META.get('HTTP_REFERER'))
+        total_likes = self.like_handler.get_post_total_likes(post)
+
+        return JsonResponse({"liked": liked, "total_likes": total_likes})

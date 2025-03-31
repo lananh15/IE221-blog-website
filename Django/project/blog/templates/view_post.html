@@ -4,6 +4,7 @@
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="csrf-token" content="{{ csrf_token }}">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Bài viết</title>
 
@@ -12,6 +13,7 @@
    <link rel="icon" type="image/x-icon" href="{% static 'image/doraemon.webp' %}">
    <!-- custom css file link  -->
    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
 <body>
@@ -53,15 +55,30 @@
          {% endif %}
          <div class="post-title">{{ post.title }}</div>
          <div class="post-content">{{ post.content|safe }}</div>
-         <div class="icons">
+         <!-- <div class="icons">
             <div><i class="fas fa-comment"></i><span>({{ total_post_comments }})</span></div>
             {% if user_id %}
                <button type="submit" name="like_post"><i class="fas fa-heart" style="{% if user_liked %}color:red;{% endif %}"></i><span>({{ total_post_likes }})</span></button>
             {% else %}
                <span><i class="fas fa-heart"></i> ({{ total_post_likes }})</span>
             {% endif %}
+         </div> -->
+         
+         <div class="icons">
+            <a href="{% url 'view_post' post_id=post.id %}">
+               <i class="fas fa-comment"></i><span>({{ total_comments }})</span>
+            </a>
+               
+            {% if user_id %}
+            <button type="button" class="like-btn" data-post-id="{{ post.id }}">
+               <i class="fas fa-heart" style="{% if user_liked %}color: red;{% endif %}"></i>
+               <span class="like-count">({{ total_post_likes }})</span>
+            </button>
+            {% else %}
+            <span><i class="fas fa-heart"></i> ({{ total_post_likes }})</span>
+            {% endif %}
          </div>
-      
+
       </form>
       {% else %}
          <p class="empty">Không tìm thấy bài viết!</p>

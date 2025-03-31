@@ -31,3 +31,36 @@ window.onscroll = () =>{
 document.querySelectorAll('.content-150').forEach(content => {
    if(content.innerHTML.length > 150) content.innerHTML = content.innerHTML.slice(0, 150);
 });
+
+
+$(document).ready(function () {
+   $(".like-btn").click(function (e) {
+      e.preventDefault();  // Ngăn chặn submit form mặc định
+
+      let postId = $(this).data("post-id");
+      let likeIcon = $(this).find("i");
+      let likeCountSpan = $(this).find(".like-count");
+
+      $.ajax({
+         url: `/like-post/${postId}`,
+         type: "POST",
+         headers: { "X-CSRFToken": getCSRFToken() },
+         success: function (data) {
+            if (data.liked) {
+               likeIcon.css("color", "red");
+            } else {
+               likeIcon.css("color", "");
+            }
+            likeCountSpan.text(`(${data.total_likes})`);
+         },
+         error: function (xhr, status, error) {
+            console.error("Lỗi khi xử lý like:", error);
+         }
+      });
+   });
+});
+
+// Hàm lấy CSRF token
+function getCSRFToken() {
+   return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
