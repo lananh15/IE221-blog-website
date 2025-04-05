@@ -3,3 +3,7 @@ django
 django-allauth
 django-tinymce
 python-dotenv
+requests
+pyjwt
+beautifulsoup4
+Pillow
